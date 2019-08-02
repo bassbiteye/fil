@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\OperationRepository")
@@ -18,21 +20,33 @@ class Operation
 
     /**
      * @ORM\Column(type="bigint")
+     * @Assert\NotBlank
+     *  @Assert\Positive(
+     * message="cette valeur doit être positive"
+     * )
+     *  @Groups({"liste"})
      */
     private $montantdepose;
 
     /**
      * @ORM\Column(type="bigint")
+     * @Assert\NotBlank
+     *  @Assert\Positive(
+     * message="cette valeur doit être positive"
+     * )
+     * @Groups({"liste"})
      */
     private $monatantAvantDepot;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"liste"})
      */
     private $DateDepot;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Compte", inversedBy="operations")
+     * @Groups({"liste"})
      */
     private $compte;
 

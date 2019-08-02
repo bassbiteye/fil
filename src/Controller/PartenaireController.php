@@ -3,23 +3,24 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Compte;
+use App\Entity\Operation;
 use App\Entity\Partenaire;
+use PhpParser\Node\Stmt\Catch_;
+use App\Repository\OperationRepository;
 use App\Repository\PartenaireRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Yaml\Exception\ParseException;
 
-use App\Entity\Operation;
-use App\Entity\Compte;
-use PhpParser\Node\Stmt\Catch_;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @Route("/api")
@@ -33,18 +34,28 @@ class PartenaireController extends AbstractController
     public function index()
     {
         return $this->json([
-            'message' => 'Welcome to your new controller!',
+            'messag' => 'Welcome to your new controller!',
             'path' => 'src/Controller/PartenaireController.php',
         ]);
     }
     /**
-     *  @Route("/partenaire", name="liste", methods={"GET"})
+     *  @Route("/liste", name="liste", methods={"GET"})
      */
     public function show(PartenaireRepository $partenaireRepository, SerializerInterface $serializer)
     {
         $partenaire = $partenaireRepository->findAll();
 
         $data      = $serializer->serialize($partenaire, 'json', ['groups' => ['lister']]);
+        return new Response($data, 200, []);
+    }
+    /**
+     *  @Route("/history", name="histor", methods={"GET"})
+     */
+    public function historique(OperationRepository $operationRepository, SerializerInterface $serializer)
+    {
+        $operation = $operationRepository->findAll();
+
+        $data      = $serializer->serialize($operation, 'json', ['groups' => ['liste']]);
         return new Response($data, 200, []);
     }
     private $passwordEncoder;
@@ -59,7 +70,7 @@ class PartenaireController extends AbstractController
      * isGranted("ROLE_SUPER")
      */
     public function ajoutP(Request $request,  EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator, UserPasswordEncoderInterface $passwordEncoder)
-    {
+    { 
         $user = $this->getUser();
         $values = json_decode($request->getContent());
 
@@ -81,14 +92,24 @@ class PartenaireController extends AbstractController
             }
             $entityManager->persist($partenaire);
             $entityManager->flush();
+
             if ($partenaire) {
                 $compte = new Compte();
-                $compte->setNumCompte($values->numCompte);
+                 //recuperer l'entité partenaire dans compte
+                 $repo = $this->getDoctrine()->getRepository(Partenaire::class);
+                 $part = $repo->find($partenaire->getId());
+                $random =$partenaire->getId() .random_int(100000,999999);
+                $compte->setNumCompte($random);
                 $compte->setSolde(0);
-                //recuperer l'entité partenaire dans compte
-                $repo = $this->getDoctrine()->getRepository(Partenaire::class);
-                $part = $repo->find($partenaire->getId());
                 $compte->setPartenaire($part);
+                $errors = $validator->validate($compte);
+
+                if (count($errors)) {
+                    $errors = $serializer->serialize($errors, 'json');
+                    return new Response($errors, 500, [
+                        'Content-Type' => 'application/json'
+                    ]);
+                }
                 $entityManager->persist($compte);
                 $entityManager->flush();
 
@@ -96,11 +117,11 @@ class PartenaireController extends AbstractController
                 $user->setUsername($values->username);
                 $user->setNom($values->nom);
                 $user->setPrenom($values->prenom);
-                $user->setEtat($values->etat);
+                $user->setEtat("actif");
                 $user->setTelephone($values->telephone);
                 $user->setPhoto($values->photo);
                 $user->setPassword($passwordEncoder->encodePassword($user, $values->password));
-                $user->setRoles($values->roles);
+                $user->setRoles(["ROLE_ADMIN"]);
                 //recuperer l'entité partenaire dans user
                 $repo = $this->getDoctrine()->getRepository(Partenaire::class);
                 $part = $repo->find($partenaire->getId());
@@ -110,23 +131,31 @@ class PartenaireController extends AbstractController
                 $repo = $this->getDoctrine()->getRepository(Compte::class);
                 $compte = $repo->find($compte->getId());
                 $user->setCompte($compte);
+                $errors = $validator->validate($user);
 
+                if (count($errors)) {
+                    $errors = $serializer->serialize($errors, 'json');
+                    return new Response($errors, 500, [
+                        'Content-Type' => 'application/json'
+                    ]);
+                }
                 $entityManager->persist($user);
                 $entityManager->flush();
             }
+            $data = [
+                'statuss' => 201,
+                'messge' => 'Le partenaire a été créé par ' . $user->getNom() . ' ' . $user->getPrenom()
+            ];
+    
+            return new JsonResponse($data, 201);
+    
         }
 
 
+       
         $data = [
-            'status' => 201,
-            'message' => 'Le partenaire a été créé par ' . $user->getNom() . ' ' . $user->getPrenom()
-        ];
-
-        return new JsonResponse($data, 201);
-
-        $data = [
-            'status' => 500,
-            'message' => 'Vous devez renseigner les tous  champs'
+            'stat' => 500,
+            'messaage' => 'Vous devez renseigner les tous  champs'
         ];
         return new JsonResponse($data, 500);
     }
@@ -169,6 +198,13 @@ class PartenaireController extends AbstractController
 
         $values = json_decode($request->getContent());
         try {
+            if($values->solde<75000){
+                $exception = [
+                    'status' => 500,
+                    'message' => 'le montant doit etre supérieur a 75000 f'
+                ];
+                return new JsonResponse($exception, 500);
+            }
             $repo = $this->getDoctrine()->getRepository(Compte::class);
             $compte = $repo->findOneBy(['numCompte' => $values->numCompte]);
             $solde = $compte->getSolde();
@@ -224,20 +260,20 @@ class PartenaireController extends AbstractController
         $values = json_decode($request->getContent());
         $user = $this->getUser();
         try {
-            $random =  random_int(1, 100000);
+
             $repo = $this->getDoctrine()->getRepository(Partenaire::class);
             $partenaire = $repo->findOneBy(['ninea' => $values->ninea]);
             if($partenaire){
             $repo = $this->getDoctrine()->getRepository(Compte::class);
-            $compte = $repo->findOneBy(['numCompte' =>$random ]);
-            if($compte){
-            $exception = [
-                'status' => 200,
-                'message' => 'compte existe'
-            ];
-            return new JsonResponse($exception, 200);
-            }
-        }else{
+         
+            // if($compte){
+            // $exception = [
+            //     'status' => 200,
+            //     'message' => 'compte existe'
+            // ];
+            // return new JsonResponse($exception, 200);
+            // }
+         }else{
             $exception = [
                 'status' => 500,
                 'message' => 'ce partenaire  n\'existe pas'
@@ -254,6 +290,7 @@ class PartenaireController extends AbstractController
         }
       
 
+        $random =$partenaire->getId() .random_int(100000,999999);
 
     
             $compte = new Compte();

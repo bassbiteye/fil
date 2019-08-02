@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -23,11 +24,13 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=180, unique=true)
      * @Assert\NotBlank
+     * @Groups({"lister"})
      */
     private $username;
 
     /**
      * @ORM\Column(type="json")
+     * @Groups({"lister"})
      */
     private $roles = [];
 
@@ -41,24 +44,30 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=10)
      * @Assert\NotBlank
+     * @Groups({"lister"})
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=10)
      * @Assert\NotBlank
+     * @Groups({"lister"})
      */
     private $prenom;
 
     /**
      * @ORM\Column(type="integer")
      * @Assert\NotBlank
-     * @Assert\Range(
-     *      min = 120,
-     *      max = 180,
-     *      minMessage = "You must be at least {{ limit }}cm tall to enter",
-     *      maxMessage = "You cannot be taller than {{ limit }}cm to enter"
+     *  @Assert\Length(
+     *      min = 9,
+     *      max = 14,
+     *      minMessage = "le numero doit etre au moins {{ limit }} chiffres",
+     *      maxMessage = "le numero doit etre au max {{ limit }} chiffres",
      * )
+     *  @Assert\Positive(
+     * message="cette valeur doit être positive"
+     * )
+     * @Groups({"lister"})
      */
     private $telephone;
 
@@ -69,6 +78,8 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     *  @Assert\NotBlank
+     * @Groups({"lister"})
      */
     private $photo;
 
@@ -79,11 +90,13 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=10)
+     * @Groups({"lister"})
      */
     private $etat;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Compte", inversedBy="users")
+     * @Groups({"lister"})
      */
     private $Compte;
 

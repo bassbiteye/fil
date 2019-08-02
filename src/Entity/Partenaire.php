@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 
 /**
@@ -23,6 +24,13 @@ class Partenaire
     /**
      * @ORM\Column(type="string", nullable=false)
      * @Assert\NotBlank
+     *  @Assert\Length(
+     *      min = 2,
+     *      max = 20,
+     *      minMessage = "la raison Social dois être au moins {{ limit }} carateres",
+     *      maxMessage = "la raison Social ne peut pas être plus grand que {{ limit }} carateres"
+     * )
+     * @Groups({"lister"})
      */
     private $raisonSocial;
 
@@ -35,18 +43,28 @@ class Partenaire
      *      minMessage = " adresse dois être au moins {{ limit }} carateres",
      *      maxMessage = "adresse ne peut pas être plus grand que {{ limit }} carateres"
      * )
+     * @Groups({"lister"})
      */
     private $adresse;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="bigint")
      * @Assert\NotBlank
+     *   @Assert\Length(
+     *     min = 12,
+     *      minMessage  = " NINEA dois être 12 numeros"
+     * )
+     * @Assert\Positive(
+     * message="cette valeur doit être positive"
+     * )
+     * @Groups({"lister"})
      */
     private $ninea;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="partenaires")
      * @ORM\JoinColumn(nullable=false)
+     *  @Groups({"lister"})
      */
     private $createdBy;
 

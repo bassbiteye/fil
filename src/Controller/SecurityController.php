@@ -29,7 +29,7 @@ class SecurityController extends AbstractController
     public function acceuil()
     {
         return $this->json([
-            'message' => 'Welcome to your new controller!',
+            'messag' => 'Welcome to your new controller!',
             'path' => 'src/Controller/SecurityController.php',
         ]);
     }
@@ -162,13 +162,20 @@ class SecurityController extends AbstractController
         }
         $entityManager->flush();
         $data = [
-            'status' => 200,
+            'statu' => 200,
             'message' => 'Le utilisateur a bien été modifié'
         ];
         return new JsonResponse($data);
     }
 
-   
+     function verifyInput($var){
+         $var = trim($var);
+         $var= stripcslashes($var);
+         $var= htmlspecialchars($var);
+
+         return $var;
+    
+    }
 
 
 

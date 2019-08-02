@@ -2,9 +2,10 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -20,17 +21,22 @@ class Compte
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string" , length=10)
+     * @Assert\NotBlank
+     * @Groups({"liste"})
      */
     private $numCompte;
 
     /**
      * @ORM\Column(type="bigint")
+     *  @Assert\NotBlank
+     * @Groups({"liste"})
      */
     private $solde;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Partenaire", inversedBy="comptes")
+     * @Groups({"liste"})
      */
     private $partenaire;
 
@@ -55,12 +61,12 @@ class Compte
         return $this->id;
     }
 
-    public function getNumCompte(): ?int
+    public function getNumCompte(): ?string
     {
         return $this->numCompte;
     }
 
-    public function setNumCompte(int $numCompte): self
+    public function setNumCompte(string $numCompte): self
     {
         $this->numCompte = $numCompte;
 
