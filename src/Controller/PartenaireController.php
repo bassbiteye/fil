@@ -14,8 +14,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Yaml\Exception\ParseException;
 
-use Symfony\Component\Security\Core\User\UserInterface;
 use App\Entity\Operation;
 use App\Entity\Compte;
 use PhpParser\Node\Stmt\Catch_;
@@ -57,7 +57,6 @@ class PartenaireController extends AbstractController
     /**
      * @Route("/addP", name="add", methods={"POST"})
      * isGranted("ROLE_SUPER")
-     * isGranted("ROLE_ADMIN")
      */
     public function ajoutP(Request $request,  EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator, UserPasswordEncoderInterface $passwordEncoder)
     {
@@ -107,11 +106,11 @@ class PartenaireController extends AbstractController
                 $part = $repo->find($partenaire->getId());
                 $user->setPartenaire($part);
                 //recuperer l'entité partenaire du compte
-             
-                    $repo = $this->getDoctrine()->getRepository(Compte::class);
-                    $compte = $repo->find($compte->getId());
-                    $user->setCompte($compte);
-            
+
+                $repo = $this->getDoctrine()->getRepository(Compte::class);
+                $compte = $repo->find($compte->getId());
+                $user->setCompte($compte);
+
                 $entityManager->persist($user);
                 $entityManager->flush();
             }
@@ -124,7 +123,7 @@ class PartenaireController extends AbstractController
         ];
 
         return new JsonResponse($data, 201);
-        
+
         $data = [
             'status' => 500,
             'message' => 'Vous devez renseigner les tous  champs'
@@ -171,22 +170,21 @@ class PartenaireController extends AbstractController
         $values = json_decode($request->getContent());
         try {
             $repo = $this->getDoctrine()->getRepository(Compte::class);
-        $compte = $repo->findOneBy(['numCompte' => $values->numCompte]);
-        $solde = $compte->getSolde();
-        $compte->setSolde($values->solde + $solde);
-        $entityManager->persist($compte);
-        $entityManager->flush();
-        
+            $compte = $repo->findOneBy(['numCompte' => $values->numCompte]);
+            $solde = $compte->getSolde();
+            $compte->setSolde($values->solde + $solde);
+            $entityManager->persist($compte);
+            $entityManager->flush();
         } catch (ParseException $exception) {
             $exception = [
                 'status' => 500,
                 'message' => 'Vous devez renseigner les tous  champs'
             ];
             return new JsonResponse($exception, 500);
-           // printf('Unable to parse the YAML string: %s', $exception->getMessage());
-        }  
-        
-       
+            // printf('Unable to parse the YAML string: %s', $exception->getMessage());
+        }
+
+
         if (isset($compte)) {
             $operation = new Operation();
             $operation->setMontantdepose($values->solde);
@@ -216,34 +214,57 @@ class PartenaireController extends AbstractController
             ];
             return new JsonResponse($data);
         }
-
     }
-     /**
+    /**
      * @Route("/addCompte", name="compte", methods={"POST"})
      *
      */
     public function addCompte(Request $request, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $entityManager)
-    {
-        $user = $this->getUser();
-
+    { 
         $values = json_decode($request->getContent());
-        $repo = $this->getDoctrine()->getRepository(Partenaire::class);
-        $partenaire = $repo->findOneBy(['ninea' => $values->ninea]);
-        $repo = $this->getDoctrine()->getRepository(Compte::class);
-        $compte = $repo->findOneBy(['numCompte' => $values->numCompte]);
+        $user = $this->getUser();
+        try {
+            $random =  random_int(1, 100000);
+            $repo = $this->getDoctrine()->getRepository(Partenaire::class);
+            $partenaire = $repo->findOneBy(['ninea' => $values->ninea]);
+            if($partenaire){
+            $repo = $this->getDoctrine()->getRepository(Compte::class);
+            $compte = $repo->findOneBy(['numCompte' =>$random ]);
+            if($compte){
+            $exception = [
+                'status' => 200,
+                'message' => 'compte existe'
+            ];
+            return new JsonResponse($exception, 200);
+            }
+        }else{
+            $exception = [
+                'status' => 500,
+                'message' => 'ce partenaire  n\'existe pas'
+            ];
+            return new JsonResponse($exception, 500);
+        }
 
-     
-        if (!$compte) {
-           
+         } catch (ParseException $exception) {
+            $exception = [
+                'status' => 500,
+                'message' => 'ce Partenaire n\'existe pas'
+            ];
+            return new JsonResponse($exception, 500); 
+        }
+      
+
+
+    
             $compte = new Compte();
-            $compte->setNumCompte($values->numCompte);
+            $compte->setNumCompte($random);
             $compte->setSolde(0);
             $compte->setPartenaire($partenaire);
 
-        
+
             $entityManager->persist($compte);
             $entityManager->flush();
-      
+
 
             $errors = $validator->validate($compte);
 
@@ -253,17 +274,13 @@ class PartenaireController extends AbstractController
                     'Content-Type' => 'application/json'
                 ]);
             }
-            $entityManager->flush();
-            $data = [
-                'status' => 200,
-                'message' => 'Le depot a éte fait avec succes ' . 'par ' . $user->getNom() . ' ' . $user->getPrenom()
-            ];
-            return new JsonResponse($data);
-        }
+            
+     
+
         $entityManager->flush();
         $data = [
             'status' => 200,
-            'message' => 'Le nouveau compte a bien été ajouté'
+            'message' => 'Le nouveau compte a bien été ajouté ' . 'par ' . $user->getNom() . ' ' . $user->getPrenom()
         ];
         return new JsonResponse($data);
     }
