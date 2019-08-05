@@ -2,14 +2,15 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\HttpFoundation\File\File;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -46,15 +47,15 @@ class User implements UserInterface
     private $password;
 
     /**
-     * @ORM\Column(type="string", length=10)
-     * @Assert\NotBlank
+     * @ORM\Column(type="string", length=10 , nullable=false)
+     * @Assert\NotBlank()
      * @Groups({"lister"})
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=10)
-     * @Assert\NotBlank
+     * @Assert\NotBlank()
      * @Groups({"lister"})
      */
     private $prenom;

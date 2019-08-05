@@ -63,66 +63,48 @@ class SecurityController extends AbstractController
      * @Route("/register", name="register", methods={"POST"})
       *@IsGranted("ROLE_ADMIN")
      */
-    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, EntityManagerInterface $entityManager)
+    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, EntityManagerInterface $entityManager, ValidatorInterface $validator, SerializerInterface $serializer)
     {
         $status = 'statu';
         $message = 'messages';
         $userr = $this->getUser();
-        $var=$userr->getPartenaires();
+     
        
           
         $user = new User();
         
-       /// $partenaire = new Partenaire();
+        $partenaire = new Partenaire();
         $compte = new Compte();
        
         $form = $this->createForm(UserType::class, $user);
         $values = $request->request->all();
         $form->submit($values);
 
-        $user->setPassword($passwordEncoder->encodePassword($user,  $form->get('password')->getData()));
+        $user->setPassword($passwordEncoder->encodePassword($user,$form->get('password')->getData()));
         $user->setEtat("actif");
         $file = $request->files->all()['imageName'];
         $user->setImageFile($file);
+        $user->setRoles(["ROLE_ADMIN"]);
         $repo = $this->getDoctrine()->getRepository(Partenaire::class);
-        $part = $repo->find($var);
+        $part = $repo->find(1);
         $user->setPartenaire($part);
         $repo = $this->getDoctrine()->getRepository(Compte::class);
-        $compte = $repo->find($compte->getId());
+        $compte = $repo->find(1);
         $user->setCompte($compte);
+        $errors = $validator->validate($user);
+
+                if (count($errors)) {
+                    $errors = $serializer->serialize($errors, 'json');
+                    return new Response($errors, 500, [
+                        'Content-Type' => 'application/json'
+                    ]);
+                }
         $entityManager->persist($user);
         $entityManager->flush();
         
-        //$values = json_decode($request->getContent());
-        // if(isset($values->username,$values->password)) {
-        //     $user = new User();
-        //     $user->setUsername($values->username);
-        //     $user->setNom($values->nom);
-        //     $user->setPrenom($values->prenom);
-        //     $user->setEtat($values->etat);
-        //     $user->setTelephone($values->telephone);
-        //     $user->setPhoto($values->photo);
-        //     $user->setPassword($passwordEncoder->encodePassword($user, $values->password));
-        //     $user->setRoles($values->roles);
-
-        //     if(!empty($values->partenaire)){
-        //     $repo=$this->getDoctrine()->getRepository(Partenaire::class);
-        //     $partenaire=$repo->find($values->partenaire);
-        //     $user->setPartenaire($partenaire); 
-        //    }
-        //     $entityManager->persist($user);
-        //     $entityManager->flush();
-
-        //     $data = [
-        //         $status => 201,
-        //         $message => 'L\'utilisateur a été créé'
-        //     ];
-
-        //     return new JsonResponse($data, 201);
-        // }
         $data = [
             $status => 500,
-            $message => 'Vous devez renseigner les clés username et password'
+            $message => 'l\'utilisateur a été créée avec succes'
         ];
         return new JsonResponse($data, 500);
     }
