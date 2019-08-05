@@ -22,8 +22,8 @@ class Partenaire
     private $id;
 
     /**
-     * @ORM\Column(type="string", nullable=false)
-     * @Assert\NotBlank
+     * @ORM\Column(type="string")
+     *  @Assert\NotBlank
      *  @Assert\Length(
      *      min = 2,
      *      max = 20,
@@ -35,8 +35,8 @@ class Partenaire
     private $raisonSocial;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank
+     * @ORM\Column(type="string", length=25, nullable=false)
+     *  @Assert\NotBlank
      * @Assert\Length(
      *      min = 5,
      *      max = 20,
@@ -49,7 +49,7 @@ class Partenaire
 
     /**
      * @ORM\Column(type="bigint")
-     * @Assert\NotBlank
+     *  @Assert\NotBlank
      *   @Assert\Length(
      *     min = 12,
      *      minMessage  = " NINEA dois être 12 numeros"

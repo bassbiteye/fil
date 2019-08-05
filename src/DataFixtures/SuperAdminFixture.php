@@ -28,7 +28,7 @@ class SuperAdminFixture extends Fixture
         $user->setPrenom('bassirou');
         $user->setEtat('actif');
         $user->setTelephone(771523139);
-        $user->setPhoto(null);
+       $user->setImageName("image.jpep");
         $user->setCompte(null);
         $user->setPartenaire(null);
 

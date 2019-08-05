@@ -4,20 +4,22 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Compte;
+use App\Form\UserType;
 use App\Entity\Operation;
 use App\Entity\Partenaire;
+use App\Form\PartenaireType;
 use PhpParser\Node\Stmt\Catch_;
 use App\Repository\OperationRepository;
 use App\Repository\PartenaireRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\File\File;
+
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Yaml\Exception\ParseException;
-
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -72,16 +74,18 @@ class PartenaireController extends AbstractController
     public function ajoutP(Request $request,  EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator, UserPasswordEncoderInterface $passwordEncoder)
     { 
         $user = $this->getUser();
-        $values = json_decode($request->getContent());
-
-        if ($user->getId()) {
+      
             $partenaire = new Partenaire();
-            $partenaire->setRaisonSocial($values->raisonSocial);
-            $partenaire->setAdresse($values->adresse);
-            $partenaire->setNinea($values->ninea);
+            $form = $this->createForm(PartenaireType::class, $partenaire);
             $repo = $this->getDoctrine()->getRepository(User::class);
             $user = $repo->find($user->getId());
             $partenaire->setCreatedBy($user);
+             $values=$request->request->all();
+             $form->submit($values);
+                $entityManager->persist($partenaire);
+                $entityManager->flush();
+            
+         
             $errors = $validator->validate($partenaire);
 
             if (count($errors)) {
@@ -90,8 +94,7 @@ class PartenaireController extends AbstractController
                     'Content-Type' => 'application/json'
                 ]);
             }
-            $entityManager->persist($partenaire);
-            $entityManager->flush();
+           
 
             if ($partenaire) {
                 $compte = new Compte();
@@ -112,37 +115,30 @@ class PartenaireController extends AbstractController
                 }
                 $entityManager->persist($compte);
                 $entityManager->flush();
-
-                $user = new User();
-                $user->setUsername($values->username);
-                $user->setNom($values->nom);
-                $user->setPrenom($values->prenom);
-                $user->setEtat("actif");
-                $user->setTelephone($values->telephone);
-                $user->setPhoto($values->photo);
-                $user->setPassword($passwordEncoder->encodePassword($user, $values->password));
-                $user->setRoles(["ROLE_ADMIN"]);
-                //recuperer l'entité partenaire dans user
-                $repo = $this->getDoctrine()->getRepository(Partenaire::class);
-                $part = $repo->find($partenaire->getId());
-                $user->setPartenaire($part);
-                //recuperer l'entité partenaire du compte
-
-                $repo = $this->getDoctrine()->getRepository(Compte::class);
-                $compte = $repo->find($compte->getId());
-                $user->setCompte($compte);
-                $errors = $validator->validate($user);
-
-                if (count($errors)) {
-                    $errors = $serializer->serialize($errors, 'json');
-                    return new Response($errors, 500, [
-                        'Content-Type' => 'application/json'
-                    ]);
-                }
-                $entityManager->persist($user);
-                $entityManager->flush();
             }
-            $data = [
+                $user = new User();
+                $form = $this->createForm(UserType::class, $user);
+                $values=$request->request->all();
+                $form->submit($values);
+               
+                    $user->setPassword($passwordEncoder->encodePassword($user,  $form->get('password')->getData()));
+                    $user->setEtat("actif");
+                    $user->setRoles(["ROLE_ADMIN"]);
+                    $file=$request->files->all()['imageName'];
+                    $user->setImageFile($file);
+                    $repo = $this->getDoctrine()->getRepository(Partenaire::class);
+                    $part = $repo->find($partenaire->getId());
+                    $user->setPartenaire($part);
+                    $repo = $this->getDoctrine()->getRepository(Compte::class);
+                    $compte = $repo->find($compte->getId());
+                    $user->setCompte($compte);
+                  $entityManager->persist($user);
+                $entityManager->flush();
+                
+              
+
+             
+             $data = [
                 'statuss' => 201,
                 'messge' => 'Le partenaire a été créé par ' . $user->getNom() . ' ' . $user->getPrenom()
             ];
@@ -150,15 +146,6 @@ class PartenaireController extends AbstractController
             return new JsonResponse($data, 201);
     
         }
-
-
-       
-        $data = [
-            'stat' => 500,
-            'messaage' => 'Vous devez renseigner les tous  champs'
-        ];
-        return new JsonResponse($data, 500);
-    }
     /**
      * @Route("/bloquer/{id}", name="par", methods={"PUT"})
      * isGranted("ROLE_SUPER")
@@ -246,7 +233,7 @@ class PartenaireController extends AbstractController
             $entityManager->flush();
             $data = [
                 'status' => 200,
-                'message' => 'Le depot a éte fait avec succes ' . 'par ' . $user->getNom() . ' ' . $user->getPrenom()
+                'message' => 'Le depot a éte fait avec succes ' . 'par ' . $user->getNom() . ' ' . $user->getPrenom() 
             ];
             return new JsonResponse($data);
         }
