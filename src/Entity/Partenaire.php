@@ -23,7 +23,8 @@ class Partenaire
 
     /**
      * @ORM\Column(type="string")
-     *  @Assert\NotBlank
+     *  @Assert\NotBlank(
+     * message =" la raison social ne doit pas etre vide")
      *  @Assert\Length(
      *      min = 2,
      *      max = 20,

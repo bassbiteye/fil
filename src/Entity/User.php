@@ -27,14 +27,14 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Assert\NotBlank
+     * @Assert\NotBlank(message =" le username ne doit pas etre vide")
      * @Groups({"lister"})
      */
     private $username;
 
     /**
      * @ORM\Column(type="json")
-     * * @Assert\NotBlank
+     *@Assert\NotBlank(message =" le role ne doit pas etre vide")
      * @Groups({"lister"})
      */
     private $roles = [];
@@ -42,27 +42,27 @@ class User implements UserInterface
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
-     * @Assert\NotBlank
+     * @Assert\NotBlank(message =" le mot de passe ne doit pas etre vide")
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=10 , nullable=false)
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(message =" le nom ne doit pas etre vide")
      * @Groups({"lister"})
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=10)
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(message =" le prenom ne doit pas etre vide")
      * @Groups({"lister"})
      */
     private $prenom;
 
     /**
      * @ORM\Column(type="integer")
-     * @Assert\NotBlank
+     * @Assert\NotBlank(message =" le numero ne doit pas etre vide")
      *  @Assert\Length(
      *      min = 9,
      *      max = 14,
@@ -85,7 +85,7 @@ class User implements UserInterface
      * NOTE: This is not a mapped field of entity metadata, just a simple property.
      * 
      * @Vich\UploadableField(mapping="User", fileNameProperty="imageName")
-     * 
+     * @Assert\NotBlank(message =" l'image ne doit pas etre vide")
      * @var File
      */
     private $imageFile;

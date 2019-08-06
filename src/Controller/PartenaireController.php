@@ -204,7 +204,6 @@ class PartenaireController extends AbstractController
                 'message' => 'Vous devez renseigner les tous  champs'
             ];
             return new JsonResponse($exception, 500);
-            // printf('Unable to parse the YAML string: %s', $exception->getMessage());
         }
 
 
@@ -214,7 +213,9 @@ class PartenaireController extends AbstractController
             $operation->setMonatantAvantDepot($solde);
             $operation->setDateDepot(new \DateTime('now'));
 
-
+            $repo = $this->getDoctrine()->getRepository(User::class);
+            $user1 = $repo->find($user);
+            $operation->setCaissier($user1);
             $repo = $this->getDoctrine()->getRepository(Compte::class);
             $Comp = $repo->find($compte);
             $operation->setCompte($Comp);
