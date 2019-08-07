@@ -61,38 +61,33 @@ class SecurityController extends AbstractController
 
     /**
      * @Route("/register", name="register", methods={"POST"})
-      *@IsGranted("ROLE_ADMIN")
-      *@IsGranted("ROLE_SUPER")
      */
     public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, EntityManagerInterface $entityManager, ValidatorInterface $validator, SerializerInterface $serializer)
     {
         $status = 'statu';
         $message = 'messages';
-        $userr = $this->getUser();
-     
-       
-          
-        $user = new User();
-        
-        $partenaire = new Partenaire();
-        $compte = new Compte();
-       
-        $form = $this->createForm(UserType::class, $user);
-        $values = $request->request->all();
-        $form->submit($values);
-
-        $user->setPassword($passwordEncoder->encodePassword($user,$form->get('password')->getData()));
-        $user->setEtat("actif");
-        $file = $request->files->all()['imageName'];
-        $user->setImageFile($file);
-        $user->setRoles(["ROLE_ADMIN"]);
+        $user = $this-> getUser();
         $repo = $this->getDoctrine()->getRepository(Partenaire::class);
-        $part = $repo->find(1);
-        $user->setPartenaire($part);
+        $id = $repo->find($user);
+        $part=$id;
         $repo = $this->getDoctrine()->getRepository(Compte::class);
         $compte = $repo->find(1);
-        $user->setCompte($compte);
-        $errors = $validator->validate($user);
+        $c=$compte;
+        $userr = new User();
+        $form = $this->createForm(UserType::class, $userr);
+        
+        $values = $request->request->all();
+        $form->submit($values);
+        $userr->setPassword($passwordEncoder->encodePassword($user,$form->get('password')->getData()));
+        $userr->setEtat("actif");
+        $file = $request->files->all()['imageName'];
+        $userr->setImageFile($file);
+        $userr->setRoles(["ROLE_ADMIN"]);
+      
+        $userr->setPartenaire($part);
+      
+        $userr->setCompte($c);
+        $errors = $validator->validate($userr);
 
                 if (count($errors)) {
                     $errors = $serializer->serialize($errors, 'json');
@@ -100,14 +95,14 @@ class SecurityController extends AbstractController
                         'Content-Type' => 'application/json'
                     ]);
                 }
-        $entityManager->persist($user);
+        $entityManager->persist($userr);
         $entityManager->flush();
         
         $data = [
-            $status => 500,
+            $status => 201,
             $message => 'l\'utilisateur a été créée avec succes'
         ];
-        return new JsonResponse($data, 500);
+        return new JsonResponse($data, 201);
     }
 
     /**

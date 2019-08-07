@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
@@ -69,7 +70,7 @@ class PartenaireController extends AbstractController
 
     /**
      * @Route("/addP", name="add", methods={"POST"})
-     * isGranted("ROLE_SUPER")
+   
      */
     public function ajoutP(Request $request,  EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator, UserPasswordEncoderInterface $passwordEncoder)
     { 
@@ -82,10 +83,6 @@ class PartenaireController extends AbstractController
             $partenaire->setCreatedBy($user);
              $values=$request->request->all();
              $form->submit($values);
-                $entityManager->persist($partenaire);
-                $entityManager->flush();
-            
-         
             $errors = $validator->validate($partenaire);
 
             if (count($errors)) {
@@ -94,14 +91,17 @@ class PartenaireController extends AbstractController
                     'Content-Type' => 'application/json'
                 ]);
             }
-           
+            $entityManager->persist($partenaire);
+            $entityManager->flush();
 
             if ($partenaire) {
                 $compte = new Compte();
                  //recuperer l'entité partenaire dans compte
                  $repo = $this->getDoctrine()->getRepository(Partenaire::class);
                  $part = $repo->find($partenaire->getId());
-                $random =$partenaire->getId() .random_int(100000,999999);
+                 $dat= new \DateTime();
+                 $dat =$dat->format('Ym');
+                $random =rand(100000,999999).$dat ;
                 $compte->setNumCompte($random);
                 $compte->setSolde(0);
                 $compte->setPartenaire($part);
@@ -132,6 +132,14 @@ class PartenaireController extends AbstractController
                     $repo = $this->getDoctrine()->getRepository(Compte::class);
                     $compte = $repo->find($compte->getId());
                     $user->setCompte($compte);
+                    $errors = $validator->validate($user);
+
+                    if (count($errors)) {
+                        $errors = $serializer->serialize($errors, 'json');
+                        return new Response($errors, 500, [
+                            'Content-Type' => 'application/json'
+                        ]);
+                    }
                   $entityManager->persist($user);
                 $entityManager->flush();
                 
@@ -185,6 +193,17 @@ class PartenaireController extends AbstractController
 
         $values = json_decode($request->getContent());
         try {
+           
+            $repo = $this->getDoctrine()->getRepository(Compte::class);
+            $compte = $repo->findOneBy(['numCompte' => $values->numCompte]);
+            if(!$compte){
+                $exception = [
+                    'status' => 500,
+                    'message' => 'le compte n\'existe pas'
+                ];
+                return new JsonResponse($exception, 500);
+            }
+            $solde = $compte->getSolde();
             if($values->solde<75000){
                 $exception = [
                     'status' => 500,
@@ -192,9 +211,6 @@ class PartenaireController extends AbstractController
                 ];
                 return new JsonResponse($exception, 500);
             }
-            $repo = $this->getDoctrine()->getRepository(Compte::class);
-            $compte = $repo->findOneBy(['numCompte' => $values->numCompte]);
-            $solde = $compte->getSolde();
             $compte->setSolde($values->solde + $solde);
             $entityManager->persist($compte);
             $entityManager->flush();
@@ -253,14 +269,7 @@ class PartenaireController extends AbstractController
             $partenaire = $repo->findOneBy(['ninea' => $values->ninea]);
             if($partenaire){
             $repo = $this->getDoctrine()->getRepository(Compte::class);
-         
-            // if($compte){
-            // $exception = [
-            //     'status' => 200,
-            //     'message' => 'compte existe'
-            // ];
-            // return new JsonResponse($exception, 200);
-            // }
+       
          }else{
             $exception = [
                 'status' => 500,
@@ -278,7 +287,9 @@ class PartenaireController extends AbstractController
         }
       
 
-        $random =$partenaire->getId() .random_int(100000,999999);
+        $dat= new \DateTime();
+                 $dat =$dat->format('ym');
+                $random =$dat.random_int(100000,999999) ;
 
     
             $compte = new Compte();

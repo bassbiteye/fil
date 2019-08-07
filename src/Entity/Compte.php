@@ -7,12 +7,19 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CompteRepository")
+ *  @UniqueEntity("numCompte" ,message =" Ce numero Compte  existe déja") 
  */
 class Compte
 {
+    public function __toString()
+    {
+        return $this->numCompte;
+    }
+        // ...
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

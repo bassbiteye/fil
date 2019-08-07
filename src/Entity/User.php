@@ -8,16 +8,23 @@ use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @Vich\Uploadable
+ *  @UniqueEntity("username" ,message =" Ce username  existe déja") 
+ * @UniqueEntity(
+ *     fields={"telephone","username"},
+ *     errorPath="telephone",
+ *     message="Ce telephone  existe déja"
+ * )
  */
 class User implements UserInterface
 {
+    
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -26,7 +33,8 @@ class User implements UserInterface
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=180, unique=true)
+     * @ORM\Column(type="string", length=20,nullable=false)
+    
      * @Assert\NotBlank(message =" le username ne doit pas etre vide")
      * @Groups({"lister"})
      */
@@ -69,6 +77,12 @@ class User implements UserInterface
      *      minMessage = "le numero doit etre au moins {{ limit }} chiffres",
      *      maxMessage = "le numero doit etre au max {{ limit }} chiffres",
      * )
+     * @Assert\NotBlank(message="Vous devez insérer un téléphone")
+     * @Assert\Regex(
+     *     pattern="/^(\+[1-9][0-9]*(\([0-9]*\)|-[0-9]*-))?[0]?[1-9][0-9\-]*$/",
+     *     match=true,
+     *     message="Votre numero ne doit pas contenir de lettre"
+     * )
      *  @Assert\Positive(
      * message="cette valeur doit être positive"
      * )
@@ -82,17 +96,27 @@ class User implements UserInterface
      */
     private $partenaires;
     /**
+   
+     *@Assert\File(
+     *     maxSize = "5M",
+     *     mimeTypes = {
+     *         "image/jpeg",
+     *         "image/pjpeg",
+     *         "image/png",
+     *     },
+     *   
+     * mimeTypesMessage = "Veuillez saisir un bon format d\'image"
+     *  ) 
      * NOTE: This is not a mapped field of entity metadata, just a simple property.
      * 
      * @Vich\UploadableField(mapping="User", fileNameProperty="imageName")
-     * @Assert\NotBlank(message =" l'image ne doit pas etre vide")
+    
      * @var File
      */
     private $imageFile;
 
     /**
      * @ORM\Column(type="string", length=255)
-     *
      * @var string
      */
     private $imageName;

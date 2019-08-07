@@ -1,26 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Project Test Suite" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="0.059035">
-    <testsuite name="App\Tests\TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="0.059035">
-      <testcase name="testAddPok" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="10" assertions="0" time="0.059035">
-        <error type="Symfony\Component\HttpKernel\Exception\BadRequestHttpException">App\Tests\TestcontrollerTest::testAddPok
-Symfony\Component\HttpKernel\Exception\BadRequestHttpException: Invalid json message received
-
-/home/bass-codeur/sites/projetfil/vendor/friendsofsymfony/rest-bundle/EventListener/BodyListener.php:115
-/home/bass-codeur/sites/projetfil/vendor/symfony/event-dispatcher/Debug/WrappedListener.php:126
-/home/bass-codeur/sites/projetfil/vendor/symfony/event-dispatcher/EventDispatcher.php:258
-/home/bass-codeur/sites/projetfil/vendor/symfony/event-dispatcher/EventDispatcher.php:233
-/home/bass-codeur/sites/projetfil/vendor/symfony/event-dispatcher/EventDispatcher.php:73
-/home/bass-codeur/sites/projetfil/vendor/symfony/event-dispatcher/Debug/TraceableEventDispatcher.php:168
-/home/bass-codeur/sites/projetfil/vendor/symfony/http-kernel/HttpKernel.php:127
-/home/bass-codeur/sites/projetfil/vendor/symfony/http-kernel/HttpKernel.php:68
-/home/bass-codeur/sites/projetfil/vendor/symfony/http-kernel/Kernel.php:198
-/home/bass-codeur/sites/projetfil/vendor/symfony/http-kernel/Client.php:68
-/home/bass-codeur/sites/projetfil/vendor/symfony/framework-bundle/Client.php:131
-/home/bass-codeur/sites/projetfil/vendor/symfony/browser-kit/Client.php:407
-/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php:18
-</error>
-      </testcase>
+  <testsuite name="Project Test Suite" tests="3" assertions="3" errors="0" failures="0" skipped="0" time="0.496720">
+    <testsuite name="App\Tests\TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" tests="3" assertions="3" errors="0" failures="0" skipped="0" time="0.496720">
+      <testcase name="testDepotok" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="39" assertions="1" time="0.415255"/>
+      <testcase name="testDepotko" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="63" assertions="1" time="0.045345"/>
+      <testcase name="testloginko" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="109" assertions="1" time="0.036120"/>
     </testsuite>
   </testsuite>
 </testsuites>
