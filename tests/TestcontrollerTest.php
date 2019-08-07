@@ -8,33 +8,33 @@ class TestcontrollerTest extends WebTestCase
 {
 
 
-    // public function testNew()
-    //  {
-    //      $client = static::createClient([],[
-    //         'PHP_AUTH_USER' => 'admin',
-    //         'PHP_AUTH_PW'   => 'passer',
-    //      ] 
+    public function testNew()
+     {
+         $client = static::createClient([],[
+            'PHP_AUTH_USER' => 'admin',
+            'PHP_AUTH_PW'   => 'passer',
+         ] 
 
-    //      );
-    //      $client->request('POST', '/api/addP',[],[],
-    //      ['CONTENT_TYPE'=>"application/json"],
-    //      '{
-    //          "raisonSocial":"Sonatel",
-    //          "ninea":"101236458974",
-    //          "adresse":"Colobane",
-    //          "username":"adm",
-    //          "password":"passer",
-    //          "prenom":"GAYE",
-    //          "nom":"Doudou Mohamet ",
-    //          "telephone":782257053,
-    //          "imageName":"/home/bass-codeur/sites/projetfil/public/images/User/bass.jpg"
-    //          }'
+         );
+         $client->request('POST', '/api/addP',[],[],
+         ['CONTENT_TYPE'=>"application/json"],
+         '{
+             "raisonSocial":"Sonatel",
+             "ninea":"101236458974",
+             "adresse":"Colobane",
+             "username":"adm",
+             "password":"passer",
+             "prenom":"GAYE",
+             "nom":"Doudou Mohamet ",
+             "telephone":null,
+             "imageName":"/home/bass-codeur/sites/projetfil/public/images/User/bass.jpg"
+             }'
 
-    //  );
-    //  $a=$client->getResponse();
-    //  var_dump($a);
-    //  $this->assertSame(500,$client->getResponse()->getStatusCode());
-    //  }
+     );
+     $a=$client->getResponse();
+     var_dump($a);
+     $this->assertSame(500,$client->getResponse()->getStatusCode());
+     }
 
     public function testDepotok()
     {
@@ -159,5 +159,35 @@ class TestcontrollerTest extends WebTestCase
         $a = $client->getResponse();
         var_dump($a);
         $this->assertSame(201, $client->getResponse()->getStatusCode());
+    }
+    public function testliste()
+    {
+        $client = static::createClient(
+            [],
+            [
+                'PHP_AUTH_USER' => 'admin',
+                'PHP_AUTH_PW'   => 'passer',
+            ]
+
+        );
+        $crawler = $client->request('GET', '/api/liste');
+        $client->getResponse();
+        $this->assertSame(200,$client->getResponse()->getStatusCode());
+     
+    }
+    public function testlisteko()
+    {
+        $client = static::createClient(
+            [],
+            [
+                'PHP_AUTH_USER' => 'admin',
+                'PHP_AUTH_PW'   => 'passer',
+            ]
+
+        );
+        $crawler = $client->request('GET', '/api/history');
+        $client->getResponse();
+        $this->assertSame(200,$client->getResponse()->getStatusCode());
+     
     }
 }

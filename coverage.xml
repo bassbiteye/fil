@@ -1,10 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Project Test Suite" tests="3" assertions="3" errors="0" failures="0" skipped="0" time="0.496720">
-    <testsuite name="App\Tests\TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" tests="3" assertions="3" errors="0" failures="0" skipped="0" time="0.496720">
-      <testcase name="testDepotok" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="39" assertions="1" time="0.415255"/>
-      <testcase name="testDepotko" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="63" assertions="1" time="0.045345"/>
-      <testcase name="testloginko" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="109" assertions="1" time="0.036120"/>
+  <testsuite name="Project Test Suite" tests="6" assertions="6" errors="0" failures="0" skipped="0" time="0.564645">
+    <testsuite name="App\Tests\TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" tests="6" assertions="6" errors="0" failures="0" skipped="0" time="0.564645">
+      <testcase name="testNew" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="11" assertions="1" time="0.145814">
+        <system-out>object(Symfony\Component\HttpFoundation\Response)#1043 (6) {
+  ["headers"]=&gt;
+  object(Symfony\Component\HttpFoundation\ResponseHeaderBag)#1099 (5) {
+    ["computedCacheControl":protected]=&gt;
+    array(2) {
+      ["no-cache"]=&gt;
+      bool(true)
+      ["private"]=&gt;
+      bool(true)
+    }
+    ["cookies":protected]=&gt;
+    array(0) {
+    }
+    ["headerNames":protected]=&gt;
+    array(4) {
+      ["content-type"]=&gt;
+      string(12) "Content-Type"
+      ["cache-control"]=&gt;
+      string(13) "Cache-Control"
+      ["date"]=&gt;
+      string(4) "Date"
+      ["x-robots-tag"]=&gt;
+      string(12) "X-Robots-Tag"
+    }
+    ["headers":protected]=&gt;
+    array(4) {
+      ["content-type"]=&gt;
+      array(1) {
+        [0]=&gt;
+        string(16) "application/json"
+      }
+      ["cache-control"]=&gt;
+      array(1) {
+        [0]=&gt;
+        string(17) "no-cache, private"
+      }
+      ["date"]=&gt;
+      array(1) {
+        [0]=&gt;
+        string(29) "Wed, 07 Aug 2019 13:36:11 GMT"
+      }
+      ["x-robots-tag"]=&gt;
+      array(1) {
+        [0]=&gt;
+        string(7) "noindex"
+      }
+    }
+    ["cacheControl":protected]=&gt;
+    array(0) {
+    }
+  }
+  ["content":protected]=&gt;
+  string(536) "{"type":"https:\/\/symfony.com\/errors\/validation","title":"Validation Failed","detail":"raisonSocial:  Cette raison Sociale  existe d\u00e9ja\nninea: Ce ninea  existe d\u00e9ja","violations":[{"propertyPath":"raisonSocial","title":" Cette raison Sociale  existe d\u00e9ja","parameters":{"{{ value }}":"\"Sonatel\""},"type":"urn:uuid:23bd9dbf-6b9b-41cd-a99e-4844bcf3077f"},{"propertyPath":"ninea","title":"Ce ninea  existe d\u00e9ja","parameters":{"{{ value }}":"101236458974"},"type":"urn:uuid:23bd9dbf-6b9b-41cd-a99e-4844bcf3077f"}]}"
+  ["version":protected]=&gt;
+  string(3) "1.1"
+  ["statusCode":protected]=&gt;
+  int(500)
+  ["statusText":protected]=&gt;
+  string(21) "Internal Server Error"
+  ["charset":protected]=&gt;
+  string(5) "UTF-8"
+}
+</system-out>
+      </testcase>
+      <testcase name="testDepotok" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="39" assertions="1" time="0.240335"/>
+      <testcase name="testDepotko" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="63" assertions="1" time="0.039835"/>
+      <testcase name="testloginko" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="109" assertions="1" time="0.023011"/>
+      <testcase name="testliste" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="163" assertions="1" time="0.067994"/>
+      <testcase name="testlisteko" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="178" assertions="1" time="0.047656"/>
     </testsuite>
   </testsuite>
 </testsuites>
