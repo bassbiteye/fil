@@ -9,13 +9,14 @@ use App\Entity\Operation;
 use App\Entity\Partenaire;
 use App\Form\PartenaireType;
 use PhpParser\Node\Stmt\Catch_;
+use App\Repository\UserRepository;
 use App\Repository\OperationRepository;
 use App\Repository\PartenaireRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\File\File;
 
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -41,6 +42,19 @@ class PartenaireController extends AbstractController
             'path' => 'src/Controller/PartenaireController.php',
         ]);
     }
+    /**
+     * @Route("/contrat", name="contrat",methods={"GET"})
+     */
+    public function contrat(PartenaireRepository $userRepository, SerializerInterface $serializer)
+    {
+        $users = $userRepository->findOneBySomeField(1);
+        $data = $serializer->serialize($users, 'json', ['groups' => ['contrat']]);
+
+        return new Response($data, 200, [
+            'Content-Type' => 'application/json'
+        ]);
+    }
+
     /**
      *  @Route("/liste", name="liste", methods={"GET"})
      */
@@ -73,17 +87,39 @@ class PartenaireController extends AbstractController
    
      */
     public function ajoutP(Request $request,  EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator, UserPasswordEncoderInterface $passwordEncoder)
-    { 
+    {
         $user = $this->getUser();
-      
-            $partenaire = new Partenaire();
-            $form = $this->createForm(PartenaireType::class, $partenaire);
-            $repo = $this->getDoctrine()->getRepository(User::class);
-            $user = $repo->find($user->getId());
-            $partenaire->setCreatedBy($user);
-             $values=$request->request->all();
-             $form->submit($values);
-            $errors = $validator->validate($partenaire);
+
+        $partenaire = new Partenaire();
+        $form = $this->createForm(PartenaireType::class, $partenaire);
+        $repo = $this->getDoctrine()->getRepository(User::class);
+        $user = $repo->find($user->getId());
+        $partenaire->setCreatedBy($user);
+        $partenaire->setEtat('actif');
+        $values = $request->request->all();
+        $form->submit($values);
+        $errors = $validator->validate($partenaire);
+
+        if (count($errors)) {
+            $errors = $serializer->serialize($errors, 'json');
+            return new Response($errors, 500, [
+                'Content-Type' => 'application/json'
+            ]);
+        }
+        $entityManager->persist($partenaire);
+        $entityManager->flush();
+        if ($partenaire) {
+            $compte = new Compte();
+            //recuperer l'entité partenaire dans compte
+            $repo = $this->getDoctrine()->getRepository(Partenaire::class);
+            $part = $repo->find($partenaire->getId());
+            $dat = new \DateTime();
+            $dat = $dat->format('ym');
+            $random = $dat . random_int(100000, 999999);
+            $compte->setNumCompte($random);
+            $compte->setSolde(0);
+            $compte->setPartenaire($part);
+            $errors = $validator->validate($compte);
 
             if (count($errors)) {
                 $errors = $serializer->serialize($errors, 'json');
@@ -91,97 +127,66 @@ class PartenaireController extends AbstractController
                     'Content-Type' => 'application/json'
                 ]);
             }
-            $entityManager->persist($partenaire);
+            $entityManager->persist($compte);
             $entityManager->flush();
-
-            if ($partenaire) {
-                $compte = new Compte();
-                 //recuperer l'entité partenaire dans compte
-                 $repo = $this->getDoctrine()->getRepository(Partenaire::class);
-                 $part = $repo->find($partenaire->getId());
-                 $dat= new \DateTime();
-                 $dat =$dat->format('Ym');
-                $random =rand(100000,999999).$dat ;
-                $compte->setNumCompte($random);
-                $compte->setSolde(0);
-                $compte->setPartenaire($part);
-                $errors = $validator->validate($compte);
-
-                if (count($errors)) {
-                    $errors = $serializer->serialize($errors, 'json');
-                    return new Response($errors, 500, [
-                        'Content-Type' => 'application/json'
-                    ]);
-                }
-                $entityManager->persist($compte);
-                $entityManager->flush();
-            }
-                $user = new User();
-                $form = $this->createForm(UserType::class, $user);
-                $values=$request->request->all();
-                $form->submit($values);
-               
-                    $user->setPassword($passwordEncoder->encodePassword($user,  $form->get('password')->getData()));
-                    $user->setEtat("actif");
-                    $user->setRoles(["ROLE_ADMIN"]);
-                    $file=$request->files->all()['imageName'];
-                    $user->setImageFile($file);
-                    $repo = $this->getDoctrine()->getRepository(Partenaire::class);
-                    $part = $repo->find($partenaire->getId());
-                    $user->setPartenaire($part);
-                    $repo = $this->getDoctrine()->getRepository(Compte::class);
-                    $compte = $repo->find($compte->getId());
-                    $user->setCompte($compte);
-                    $errors = $validator->validate($user);
-
-                    if (count($errors)) {
-                        $errors = $serializer->serialize($errors, 'json');
-                        return new Response($errors, 500, [
-                            'Content-Type' => 'application/json'
-                        ]);
-                    }
-                  $entityManager->persist($user);
-                $entityManager->flush();
-                
-              
-
-             
-             $data = [
-                'statuss' => 201,
-                'messge' => 'Le partenaire a été créé par ' . $user->getNom() . ' ' . $user->getPrenom()
-            ];
-    
-            return new JsonResponse($data, 201);
-    
         }
-    /**
-     * @Route("/bloquer/{id}", name="par", methods={"PUT"})
-     * isGranted("ROLE_SUPER")
-     */
-    public function update(Request $request, SerializerInterface $serializer, Partenaire $partenaire, ValidatorInterface $validator, EntityManagerInterface $entityManager)
-    {
-        $partenaireUpdate = $entityManager->getRepository(Partenaire::class)->find($partenaire->getId());
-        $data = json_decode($request->getContent());
-        foreach ($data as $key => $value) {
-            if ($key && !empty($value)) {
-                $name = ucfirst($key);
-                $setter = 'set' . $name;
-                $partenaireUpdate->$setter($value);
-            }
-        }
-        $errors = $validator->validate($partenaireUpdate);
+        $user = new User();
+        $form = $this->createForm(UserType::class, $user);
+        $values = $request->request->all();
+        $form->submit($values);
+
+        $user->setPassword($passwordEncoder->encodePassword($user,  $form->get('password')->getData()));
+        $user->setEtat("actif");
+        $user->setRoles(["ROLE_ADMIN"]);
+        $file = $request->files->all()['imageName'];
+        $user->setImageFile($file);
+        $repo = $this->getDoctrine()->getRepository(Partenaire::class);
+        $part = $repo->find($partenaire->getId());
+        $user->setPartenaire($part);
+        $repo = $this->getDoctrine()->getRepository(Compte::class);
+        $compte = $repo->find($compte->getId());
+        $user->setCompte($compte);
+        $errors = $validator->validate($user);
+
         if (count($errors)) {
             $errors = $serializer->serialize($errors, 'json');
             return new Response($errors, 500, [
                 'Content-Type' => 'application/json'
             ]);
         }
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+
+
+
+        $data = [
+            'statuss' => 201,
+            'messge' => 'Le partenaire a été créé par ' . $user->getNom() . ' ' . $user->getPrenom()
+        ];
+
+        return new JsonResponse($data, 201);
+    }
+    /**
+     * @Route("/bloquer/{id}", name="par", methods={"PUT"})
+     * isGranted("ROLE_SUPER")
+     */
+    public function update(Request $request, SerializerInterface $serializer, User $user, ValidatorInterface $validator, EntityManagerInterface $entityManager)
+    {
+        $partenaire = $entityManager->getRepository(Partenaire::class)->find($user->getId());
+      
+        if ($partenaire->getEtat() == 'actif') {
+            $partenaire->setEtat('bloquer');
+        } else if ($partenaire->getEtat() == 'bloquer') {
+            $partenaire->setEtat('actif');
+        }
+        $entityManager->persist($partenaire);
         $entityManager->flush();
         $data = [
-            'status' => 200,
-            'message' => 'Le partenaire a bien été modifié'
+            'status' => 201,
+            'msg' => 'le partenaire est en mode  '.$partenaire->getEtat()
         ];
-        return new JsonResponse($data);
+        return new JsonResponse($data, 201);
     }
     /**
      * @Route("/depot", name="upda", methods={"POST"})
@@ -193,10 +198,10 @@ class PartenaireController extends AbstractController
 
         $values = json_decode($request->getContent());
         try {
-           
+
             $repo = $this->getDoctrine()->getRepository(Compte::class);
             $compte = $repo->findOneBy(['numCompte' => $values->numCompte]);
-            if(!$compte){
+            if (!$compte) {
                 $exception = [
                     'status' => 500,
                     'message' => 'le compte n\'existe pas'
@@ -204,7 +209,7 @@ class PartenaireController extends AbstractController
                 return new JsonResponse($exception, 500);
             }
             $solde = $compte->getSolde();
-            if($values->solde<75000){
+            if ($values->solde < 75000) {
                 $exception = [
                     'status' => 500,
                     'message' => 'le montant doit etre supérieur a 75000 f'
@@ -250,7 +255,7 @@ class PartenaireController extends AbstractController
             $entityManager->flush();
             $data = [
                 'status' => 200,
-                'message' => 'Le depot a éte fait avec succes ' . 'par ' . $user->getNom() . ' ' . $user->getPrenom() 
+                'message' => 'Le depot a éte fait avec succes ' . 'par ' . $user->getNom() . ' ' . $user->getPrenom()
             ];
             return new JsonResponse($data);
         }
@@ -260,58 +265,56 @@ class PartenaireController extends AbstractController
      *
      */
     public function addCompte(Request $request, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $entityManager)
-    { 
+    {
         $values = json_decode($request->getContent());
         $user = $this->getUser();
         try {
 
             $repo = $this->getDoctrine()->getRepository(Partenaire::class);
             $partenaire = $repo->findOneBy(['ninea' => $values->ninea]);
-            if($partenaire){
-            $repo = $this->getDoctrine()->getRepository(Compte::class);
-       
-         }else{
-            $exception = [
-                'status' => 500,
-                'message' => 'ce partenaire  n\'existe pas'
-            ];
-            return new JsonResponse($exception, 500);
-        }
-
-         } catch (ParseException $exception) {
+            if ($partenaire) {
+                $repo = $this->getDoctrine()->getRepository(Compte::class);
+            } else {
+                $exception = [
+                    'status' => 500,
+                    'message' => 'ce partenaire  n\'existe pas'
+                ];
+                return new JsonResponse($exception, 500);
+            }
+        } catch (ParseException $exception) {
             $exception = [
                 'status' => 500,
                 'message' => 'ce Partenaire n\'existe pas'
             ];
-            return new JsonResponse($exception, 500); 
+            return new JsonResponse($exception, 500);
         }
-      
-
-        $dat= new \DateTime();
-                 $dat =$dat->format('ym');
-                $random =$dat.random_int(100000,999999) ;
-
-    
-            $compte = new Compte();
-            $compte->setNumCompte($random);
-            $compte->setSolde(0);
-            $compte->setPartenaire($partenaire);
 
 
-            $entityManager->persist($compte);
-            $entityManager->flush();
+        $dat = new \DateTime();
+        $dat = $dat->format('ym');
+        $random = $dat . random_int(100000, 999999);
 
 
-            $errors = $validator->validate($compte);
+        $compte = new Compte();
+        $compte->setNumCompte($random);
+        $compte->setSolde(0);
+        $compte->setPartenaire($partenaire);
 
-            if (count($errors)) {
-                $errors = $serializer->serialize($errors, 'json');
-                return new Response($errors, 500, [
-                    'Content-Type' => 'application/json'
-                ]);
-            }
-            
-     
+
+        $entityManager->persist($compte);
+        $entityManager->flush();
+
+
+        $errors = $validator->validate($compte);
+
+        if (count($errors)) {
+            $errors = $serializer->serialize($errors, 'json');
+            return new Response($errors, 500, [
+                'Content-Type' => 'application/json'
+            ]);
+        }
+
+
 
         $entityManager->flush();
         $data = [

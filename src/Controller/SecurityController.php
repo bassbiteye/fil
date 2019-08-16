@@ -43,20 +43,21 @@ class SecurityController extends AbstractController
     {
         $this->passwordEncoder = $passwordEncoder;
     }
-    /**
-     * @Route("/liste", name="list",methods={"GET"})
-     */
+    // /**
+    //  * @Route("/liste", name="list",methods={"GET"})
+    //  */
 
 
-    public function index(UserRepository $userRepository, SerializerInterface $serializer)
-    {
-        $users = $userRepository->findAll();
-        $data = $serializer->serialize($users, 'json', ['groups' => ['lister']]);
+    // public function index(UserRepository $userRepository, SerializerInterface $serializer)
+    // {
+    //     $users = $userRepository->findAll();
+    //     $data = $serializer->serialize($users, 'json', ['groups' => ['lister']]);
 
-        return new Response($data, 200, [
-            'Content-Type' => 'application/json'
-        ]);
-    }
+    //     return new Response($data, 200, [
+    //         'Content-Type' => 'application/json'
+    //     ]);
+    // }
+
 
 
     /**
@@ -66,38 +67,38 @@ class SecurityController extends AbstractController
     {
         $status = 'statu';
         $message = 'messages';
-        $user = $this-> getUser();
+        $user = $this->getUser();
         $repo = $this->getDoctrine()->getRepository(Partenaire::class);
         $id = $repo->find($user);
-        $part=$id;
+        $part = $id;
         $repo = $this->getDoctrine()->getRepository(Compte::class);
         $compte = $repo->find(1);
-        $c=$compte;
+        $c = $compte;
         $userr = new User();
         $form = $this->createForm(UserType::class, $userr);
-        
+
         $values = $request->request->all();
         $form->submit($values);
-        $userr->setPassword($passwordEncoder->encodePassword($user,$form->get('password')->getData()));
+        $userr->setPassword($passwordEncoder->encodePassword($user, $form->get('password')->getData()));
         $userr->setEtat("actif");
         $file = $request->files->all()['imageName'];
         $userr->setImageFile($file);
         $userr->setRoles(["ROLE_ADMIN"]);
-      
+
         $userr->setPartenaire($part);
-      
+
         $userr->setCompte($c);
         $errors = $validator->validate($userr);
 
-                if (count($errors)) {
-                    $errors = $serializer->serialize($errors, 'json');
-                    return new Response($errors, 500, [
-                        'Content-Type' => 'application/json'
-                    ]);
-                }
+        if (count($errors)) {
+            $errors = $serializer->serialize($errors, 'json');
+            return new Response($errors, 500, [
+                'Content-Type' => 'application/json'
+            ]);
+        }
         $entityManager->persist($userr);
         $entityManager->flush();
-        
+
         $data = [
             $status => 201,
             $message => 'l\'utilisateur a été créée avec succes'
@@ -121,7 +122,7 @@ class SecurityController extends AbstractController
         $user = $repo->findOneBy(['username' => $username]);
         if (!$user) {
             return $this->json([
-                'message' => 'Username incorrect'
+                'message' => 'nom d\'utilisateur n\'existe pas'
             ]);
         }
 
@@ -134,7 +135,12 @@ class SecurityController extends AbstractController
         }
         if ($user->getEtat() == "bloquer") {
             return $this->json([
-                'message' => 'ACCÈS REFUSÉ vous ne pouvez pas connecter !'
+                'message' => 'ACCÈS REFUSÉ vous ne pouvez pas connecter, vous etes bloqués !'
+            ]);
+        }
+        if ($user->getPartenaire()->getEtat() == "bloquer") {
+            return $this->json([
+                'message' => 'ACCÈS REFUSÉ vous ne pouvez pas connecter,votre  partenaire a été bloqué !'
             ]);
         }
         $token = $JWTEncoder->encode([
@@ -152,36 +158,47 @@ class SecurityController extends AbstractController
      */
     public function update(Request $request, SerializerInterface $serializer, User $user, ValidatorInterface $validator, EntityManagerInterface $entityManager)
     {
-        $useretat = $entityManager->getRepository(User::class)->find($user->getId());
-        $data = json_decode($request->getContent());
-        foreach ($data as $key => $value) {
-            if ($key && !empty($value)) {
-                $name = ucfirst($key);
-                $setter = 'set' . $name;
-                $useretat->$setter($value);
-            }
-        }
-        $errors = $validator->validate($useretat);
-        if (count($errors)) {
-            $errors = $serializer->serialize($errors, 'json');
-            return new Response($errors, 500, [
-                'Content-Type' => 'application/json'
+        $user = $entityManager->getRepository(User::class)->find($user->getId());
+        if ($user->getUsername() == 'admin') {
+            return $this->json([
+                'message' => 'cet utilisateur ne pas etre bloqué!'
             ]);
         }
+        if ($user->getEtat() == 'actif') {
+            $user->setEtat('bloquer');
+        } else if ($user->getEtat() == 'bloquer') {
+            $user->setEtat('actif');
+        }
+        $entityManager->persist($user);
         $entityManager->flush();
         $data = [
-            'statu' => 200,
-            'message' => 'Le utilisateur a bien été modifié'
+            'status' => 201,
+            'msg' => 'l\'utilisateur est en mode '.$user->getEtat() 
         ];
-        return new JsonResponse($data);
+        return new JsonResponse($data, 201);
     }
-
-    function verifyInput($var)
+    /**
+     * @Route("/affecter/{id}", name="user", methods={"PUT"})
+     */
+    public function affecter(Request $request, SerializerInterface $serializer, User $user, ValidatorInterface $validator, EntityManagerInterface $entityManager)
     {
-        $var = trim($var);
-        $var = stripcslashes($var);
-        $var = htmlspecialchars($var);
-
-        return $var;
-    }
+        $user = $entityManager->getRepository(User::class)->find($user->getId());
+        if ($user->getUsername() == 'admin') {
+            return $this->json([
+                'message' => 'cet utilisateur ne pas etre bloqué!'
+            ]);
+        }
+        if ($user->getEtat() == 'actif') {
+            $user->setEtat('bloquer');
+        } else if ($user->getEtat() == 'bloquer') {
+            $user->setEtat('actif');
+        }
+        $entityManager->persist($user);
+        $entityManager->flush();
+        $data = [
+            'status' => 201,
+            'msg' => 'l\'utilisateur est en mode '.$user->getEtat() 
+        ];
+        return new JsonResponse($data, 201);
+    }  
 }

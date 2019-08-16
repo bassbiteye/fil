@@ -23,6 +23,7 @@ class Partenaire
     public function __toString()
     {
         return $this->raisonSocial;
+    
     }
 
     // ...
@@ -44,7 +45,8 @@ class Partenaire
      *      minMessage = "la raison Social dois être au moins {{ limit }} carateres",
      *      maxMessage = "la raison Social ne peut pas être plus grand que {{ limit }} carateres"
      * )
-     * @Groups({"lister"})
+     *@Groups({"lister"})
+     *@Groups({"contrat"})
      */
     private $raisonSocial;
 
@@ -58,6 +60,7 @@ class Partenaire
      *      maxMessage = "adresse ne peut pas être plus grand que {{ limit }} carateres"
      * )
      * @Groups({"lister"})
+     *@Groups({"contrat"})
      */
     private $adresse;
 
@@ -72,25 +75,34 @@ class Partenaire
      * message="cette valeur doit être positive"
      * )
      * @Groups({"lister"})
+     *@Groups({"contrat"})
      */
     private $ninea;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="partenaires")
      * @ORM\JoinColumn(nullable=false)
-     *  @Groups({"lister"})
+
      */
     private $createdBy;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="partenaire")
+      *@Groups({"contrat"})
+      *  @Groups({"lister"})
      */
     private $users;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Compte", mappedBy="partenaire")
+    * @Groups({"lister"})
      */
     private $comptes;
+
+    /**
+     * @ORM\Column(type="string", length=10)
+     */
+    private $etat;
 
     public function __construct()
     {
@@ -209,6 +221,18 @@ class Partenaire
                 $compte->setPartenaire(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getEtat(): ?string
+    {
+        return $this->etat;
+    }
+
+    public function setEtat(string $etat): self
+    {
+        $this->etat = $etat;
 
         return $this;
     }

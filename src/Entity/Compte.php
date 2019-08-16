@@ -28,9 +28,10 @@ class Compte
     private $id;
 
     /**
-     * @ORM\Column(type="string" , length=10)
+     * @ORM\Column(type="string" , length=20)
      * @Assert\NotBlank
      * @Groups({"liste"})
+     *  * @Groups({"lister"})
      */
     private $numCompte;
 
@@ -38,6 +39,7 @@ class Compte
      * @ORM\Column(type="bigint")
      *  @Assert\NotBlank
      * @Groups({"liste"})
+     *  * @Groups({"lister"})
      */
     private $solde;
 
@@ -54,6 +56,7 @@ class Compte
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="Compte")
+     
      */
     private $users;
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Project Test Suite" tests="6" assertions="6" errors="0" failures="0" skipped="0" time="0.564645">
-    <testsuite name="App\Tests\TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" tests="6" assertions="6" errors="0" failures="0" skipped="0" time="0.564645">
-      <testcase name="testNew" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="11" assertions="1" time="0.145814">
+  <testsuite name="Project Test Suite" tests="6" assertions="6" errors="0" failures="0" skipped="0" time="0.635596">
+    <testsuite name="App\Tests\TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" tests="6" assertions="6" errors="0" failures="0" skipped="0" time="0.635596">
+      <testcase name="testNew" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="11" assertions="1" time="0.168908">
         <system-out>object(Symfony\Component\HttpFoundation\Response)#1043 (6) {
   ["headers"]=&gt;
   object(Symfony\Component\HttpFoundation\ResponseHeaderBag)#1099 (5) {
@@ -42,7 +42,7 @@
       ["date"]=&gt;
       array(1) {
         [0]=&gt;
-        string(29) "Wed, 07 Aug 2019 13:36:11 GMT"
+        string(29) "Wed, 07 Aug 2019 14:54:00 GMT"
       }
       ["x-robots-tag"]=&gt;
       array(1) {
@@ -67,11 +67,11 @@
 }
 </system-out>
       </testcase>
-      <testcase name="testDepotok" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="39" assertions="1" time="0.240335"/>
-      <testcase name="testDepotko" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="63" assertions="1" time="0.039835"/>
-      <testcase name="testloginko" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="109" assertions="1" time="0.023011"/>
-      <testcase name="testliste" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="163" assertions="1" time="0.067994"/>
-      <testcase name="testlisteko" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="178" assertions="1" time="0.047656"/>
+      <testcase name="testDepotok" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="39" assertions="1" time="0.285156"/>
+      <testcase name="testDepotko" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="63" assertions="1" time="0.029270"/>
+      <testcase name="testloginko" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="109" assertions="1" time="0.028050"/>
+      <testcase name="testliste" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="163" assertions="1" time="0.070722"/>
+      <testcase name="testlisteko" class="App\Tests\TestcontrollerTest" classname="App.Tests.TestcontrollerTest" file="/home/bass-codeur/sites/projetfil/tests/TestcontrollerTest.php" line="178" assertions="1" time="0.053490"/>
     </testsuite>
   </testsuite>
 </testsuites>

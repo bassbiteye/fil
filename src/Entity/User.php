@@ -36,14 +36,14 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=20,nullable=false)
     
      * @Assert\NotBlank(message =" le username ne doit pas etre vide")
-     * @Groups({"lister"})
+     * @Groups({"lister"}),
+     * @Groups({"contrat"})
      */
     private $username;
 
     /**
      * @ORM\Column(type="json")
      *@Assert\NotBlank(message =" le role ne doit pas etre vide")
-     * @Groups({"lister"})
      */
     private $roles = [];
 
@@ -57,7 +57,8 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=10 , nullable=false)
      * @Assert\NotBlank(message =" le nom ne doit pas etre vide")
-     * @Groups({"lister"})
+     * @Groups({"lister"}),
+     *@Groups({"contrat"})
      */
     private $nom;
 
@@ -65,6 +66,7 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=10)
      * @Assert\NotBlank(message =" le prenom ne doit pas etre vide")
      * @Groups({"lister"})
+     *@Groups({"contrat"})
      */
     private $prenom;
 
@@ -88,11 +90,14 @@ class User implements UserInterface
      * )
      * @Groups({"lister"})
      * * @Assert\NotBlank
+     *  @Groups({"contrat"})
      */
     private $telephone;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Partenaire", mappedBy="createdBy")
+     *  @Groups({"contrat"})
+     * 
      */
     private $partenaires;
     /**
@@ -122,25 +127,28 @@ class User implements UserInterface
     private $imageName;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime" ,nullable=true)
      *
      * @var \DateTime
      */
     private $updatedAt;
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Partenaire", inversedBy="users")
+     *  @Groups({"contrat"})
+     * 
      */
     private $partenaire;
 
     /**
      * @ORM\Column(type="string", length=10)
      * @Groups({"lister"})
+     *  @Groups({"contrat"})
      */
     private $etat;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Compte", inversedBy="users")
-     * @Groups({"lister"})
+  
      */
     private $Compte;
 
@@ -149,10 +157,23 @@ class User implements UserInterface
      */
     private $operations;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="user")
+     * @Groups({"lister"})
+     */
+    private $transactions;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="userRetrait")
+     */
+    private $retrait;
+
     public function __construct()
     {
         $this->partenaires = new ArrayCollection();
         $this->operations = new ArrayCollection();
+        $this->transactions = new ArrayCollection();
+        $this->retrait = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -393,6 +414,68 @@ class User implements UserInterface
     public function getImageName(): ?string
     {
         return $this->imageName;
+    }
+
+    /**
+     * @return Collection|Transaction[]
+     */
+    public function getTransactions(): Collection
+    {
+        return $this->transactions;
+    }
+
+    public function addTransaction(Transaction $transaction): self
+    {
+        if (!$this->transactions->contains($transaction)) {
+            $this->transactions[] = $transaction;
+            $transaction->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransaction(Transaction $transaction): self
+    {
+        if ($this->transactions->contains($transaction)) {
+            $this->transactions->removeElement($transaction);
+            // set the owning side to null (unless already changed)
+            if ($transaction->getUser() === $this) {
+                $transaction->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Transaction[]
+     */
+    public function getRetrait(): Collection
+    {
+        return $this->retrait;
+    }
+
+    public function addRetrait(Transaction $retrait): self
+    {
+        if (!$this->retrait->contains($retrait)) {
+            $this->retrait[] = $retrait;
+            $retrait->setUserRetrait($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRetrait(Transaction $retrait): self
+    {
+        if ($this->retrait->contains($retrait)) {
+            $this->retrait->removeElement($retrait);
+            // set the owning side to null (unless already changed)
+            if ($retrait->getUserRetrait() === $this) {
+                $retrait->setUserRetrait(null);
+            }
+        }
+
+        return $this;
     }
     
 }
