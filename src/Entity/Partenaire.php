@@ -32,6 +32,8 @@ class Partenaire
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     *@Groups({"lister"})
+     *@Groups({"contrat"})
      */
     private $id;
 
@@ -101,6 +103,8 @@ class Partenaire
 
     /**
      * @ORM\Column(type="string", length=10)
+     *  @Groups({"lister"})
+     *@Groups({"contrat"})
      */
     private $etat;
 

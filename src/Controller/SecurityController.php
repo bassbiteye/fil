@@ -5,20 +5,23 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Compte;
 use App\Form\UserType;
+use App\Entity\Profile;
+use App\Form\ProfileType;
+
 use App\Entity\Partenaire;
-use App\Repository\UserRepository;
+use App\Repository\ProfileRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-
 
 /**
  * @Route("/api")
@@ -43,20 +46,18 @@ class SecurityController extends AbstractController
     {
         $this->passwordEncoder = $passwordEncoder;
     }
-    // /**
-    //  * @Route("/liste", name="list",methods={"GET"})
-    //  */
+    /**
+     * @Route("/profile", name="list",methods={"GET"})
+     */
+    public function index(ProfileRepository $profileRepository, SerializerInterface $serializer)
+    {
+        $users = $profileRepository->findAll();
+        $data = $serializer->serialize($users, 'json', ['groups' => ['profile']]);
 
-
-    // public function index(UserRepository $userRepository, SerializerInterface $serializer)
-    // {
-    //     $users = $userRepository->findAll();
-    //     $data = $serializer->serialize($users, 'json', ['groups' => ['lister']]);
-
-    //     return new Response($data, 200, [
-    //         'Content-Type' => 'application/json'
-    //     ]);
-    // }
+        return new Response($data, 200, [
+            'Content-Type' => 'application/json'
+        ]);
+    }
 
 
 
@@ -76,15 +77,27 @@ class SecurityController extends AbstractController
         $c = $compte;
         $userr = new User();
         $form = $this->createForm(UserType::class, $userr);
-
+        $profile = new Profile();
+        $form1 = $this->createForm(ProfileType::class,$profile);
         $values = $request->request->all();
         $form->submit($values);
+        $form1->submit($values);
         $userr->setPassword($passwordEncoder->encodePassword($user, $form->get('password')->getData()));
         $userr->setEtat("actif");
         $file = $request->files->all()['imageName'];
         $userr->setImageFile($file);
-        $userr->setRoles(["ROLE_ADMIN"]);
-
+        if($profile->getLibelle()=='admin'){
+            $userr->setRoles(["ROLE_ADMIN"]);
+        }
+        if($profile->getLibelle()=='super'){
+            $userr->setRoles(["ROLE_SUPER"]);
+        }
+        if($profile->getLibelle()=='user'){
+            $userr->setRoles(["ROLE_USER"]);
+        }
+        if($profile->getLibelle()=='caissier'){
+            $userr->setRoles(["ROLE_CAISSIER"]);
+        }
         $userr->setPartenaire($part);
 
         $userr->setCompte($c);
@@ -122,6 +135,7 @@ class SecurityController extends AbstractController
         $user = $repo->findOneBy(['username' => $username]);
         if (!$user) {
             return $this->json([
+                'code'=>'ko',
                 'message' => 'nom d\'utilisateur n\'existe pas'
             ]);
         }
@@ -130,22 +144,29 @@ class SecurityController extends AbstractController
             ->isPasswordValid($user, $password);
         if (!$isValid) {
             return $this->json([
+                'code'=>'ko',
                 'message' => 'Mot de passe incorect'
             ]);
         }
         if ($user->getEtat() == "bloquer") {
             return $this->json([
+                'code'=>'ko',
                 'message' => 'ACCÈS REFUSÉ vous ne pouvez pas connecter, vous etes bloqués !'
             ]);
         }
-        if ($user->getPartenaire()->getEtat() == "bloquer") {
+        if ( $user->getPartenaire() && $user->getPartenaire()->getEtat() == "bloquer") {
             return $this->json([
+                'code'=>'ko',
                 'message' => 'ACCÈS REFUSÉ vous ne pouvez pas connecter,votre  partenaire a été bloqué !'
+                
             ]);
         }
         $token = $JWTEncoder->encode([
             'username' => $user->getUsername(),
-            'exp' => time() + 86400 // 1 day expiration
+            'roles'=>$user->getRoles(),
+            'nom' =>$user->getNom(),
+            'prenom'=>$user->getPrenom(),
+            'exp' => time() + 8600 // 1 day expiration
         ]);
 
         return $this->json([

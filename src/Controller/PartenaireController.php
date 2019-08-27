@@ -57,6 +57,7 @@ class PartenaireController extends AbstractController
 
     /**
      *  @Route("/liste", name="liste", methods={"GET"})
+      *@IsGranted("ROLE_SUPER")
      */
     public function show(PartenaireRepository $partenaireRepository, SerializerInterface $serializer)
     {
@@ -67,6 +68,7 @@ class PartenaireController extends AbstractController
     }
     /**
      *  @Route("/history", name="histor", methods={"GET"})
+     *  @IsGranted("ROLE_CAISSIER")
      */
     public function historique(OperationRepository $operationRepository, SerializerInterface $serializer)
     {
@@ -84,7 +86,7 @@ class PartenaireController extends AbstractController
 
     /**
      * @Route("/addP", name="add", methods={"POST"})
-   
+     *  @IsGranted("ROLE_SUPER")
      */
     public function ajoutP(Request $request,  EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator, UserPasswordEncoderInterface $passwordEncoder)
     {
@@ -137,7 +139,10 @@ class PartenaireController extends AbstractController
 
         $user->setPassword($passwordEncoder->encodePassword($user,  $form->get('password')->getData()));
         $user->setEtat("actif");
-        $user->setRoles(["ROLE_ADMIN"]);
+        if ($form->getProfile() == "admin"){
+            $user->setRoles(["ROLE_ADMIN"]);
+
+        }
         $file = $request->files->all()['imageName'];
         $user->setImageFile($file);
         $repo = $this->getDoctrine()->getRepository(Partenaire::class);
@@ -190,7 +195,7 @@ class PartenaireController extends AbstractController
     }
     /**
      * @Route("/depot", name="upda", methods={"POST"})
-     *
+     *@IsGranted("ROLE_CAISSIER")
      */
     public function depot(Request $request, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $entityManager)
     {
@@ -262,7 +267,7 @@ class PartenaireController extends AbstractController
     }
     /**
      * @Route("/addCompte", name="compte", methods={"POST"})
-     *
+     * isGranted("ROLE_SUPER")
      */
     public function addCompte(Request $request, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $entityManager)
     {
