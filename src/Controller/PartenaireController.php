@@ -139,10 +139,9 @@ class PartenaireController extends AbstractController
 
         $user->setPassword($passwordEncoder->encodePassword($user,  $form->get('password')->getData()));
         $user->setEtat("actif");
-        if ($form->getProfile() == "admin"){
             $user->setRoles(["ROLE_ADMIN"]);
 
-        }
+      
         $file = $request->files->all()['imageName'];
         $user->setImageFile($file);
         $repo = $this->getDoctrine()->getRepository(Partenaire::class);
@@ -173,7 +172,7 @@ class PartenaireController extends AbstractController
         return new JsonResponse($data, 201);
     }
     /**
-     * @Route("/bloquer/{id}", name="par", methods={"PUT"})
+     * @Route("/bloquer/{id}", name="par", methods={"POST"})
      * isGranted("ROLE_SUPER")
      */
     public function update(Request $request, SerializerInterface $serializer, User $user, ValidatorInterface $validator, EntityManagerInterface $entityManager)

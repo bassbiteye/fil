@@ -26,7 +26,7 @@ class Partenaire
     
     }
 
-    // ...
+
 
     /**
      * @ORM\Id()

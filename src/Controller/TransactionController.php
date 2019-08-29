@@ -3,26 +3,28 @@
 namespace App\Controller;
 
 use App\Entity\Tarifs;
+use App\Entity\ComEtat;
 use App\Entity\Expediteur;
+use App\Entity\Partenaire;
 use App\Entity\Transaction;
 use App\Entity\Beneficiaire;
-use App\Entity\ComEtat;
-use App\Entity\ComProprietaire;
-use App\Entity\Partenaire;
 use App\Form\ExpediteurType;
 use App\Form\BeneficiareType;
 use App\Form\TransactionType;
+use App\Entity\ComProprietaire;
+use App\Repository\UserRepository;
 use App\Repository\TarifsRepository;
-use App\Repository\TransactionRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\TransactionRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Dumper\Dumper;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * @Route("/api")
@@ -30,7 +32,9 @@ use Symfony\Component\DependencyInjection\Dumper\Dumper;
 class TransactionController extends AbstractController
 {
     /**
-     * @Route("/envoi", name="envoi")
+     *@Route("/envoi", name="envoi")
+     *@IsGranted("ROLE_ADMIN")
+     *@IsGranted("ROLE_USER")
      */
     public function envoi(Request $request, EntityManagerInterface $entityentityManager, ValidatorInterface $validator, SerializerInterface $serializer)
     {
@@ -125,6 +129,8 @@ class TransactionController extends AbstractController
     }
     /**
      * @Route("/retrait", name="retrait")
+     *  @IsGranted("ROLE_ADMIN")
+     * @IsGranted("ROLE_USER")
      */
     public function retrait(Request $request, EntityManagerInterface $entityentityManager, ValidatorInterface $validator, SerializerInterface $serializer)
     {
@@ -229,7 +235,7 @@ class TransactionController extends AbstractController
     {
 
         $transactions = $repo->findDate($debut, $fin);
-        //  var_dump($transactions);die();
+       
         if ($debut > $fin) {
             return $this->json([
                 'message' => 'la date de début  ne doit etre superieure à la date de fin !'
@@ -244,6 +250,7 @@ class TransactionController extends AbstractController
     }
     /**
      * @Route("/operationPar", name="operationPar",methods={"POST"})
+     * @IsGranted("ROLE_ADMIN")
      */
     public function operationPar(Request $request, EntityManagerInterface $entityentityManager, ValidatorInterface $validator, SerializerInterface $serializer)
     {
@@ -273,5 +280,19 @@ class TransactionController extends AbstractController
         return new Response($data, 200, [
             'Content-Type' => 'application/json'
         ]);
+    }
+
+    /**
+     *  @Route("/users", name="users", methods={"GET"})
+     */
+    public function show(UserRepository $userRepository, SerializerInterface $serializer)
+    {
+        $user = $this->getUser();
+
+        $repo = $this->getDoctrine()->getRepository(Partenaire::class);
+        $partenaire = $repo->find($user->getPartenaire());
+
+        $data      = $serializer->serialize($partenaire, 'json', ['groups' => ['lister']]);
+        return new Response($data, 200, []);
     }
 }

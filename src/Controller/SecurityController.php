@@ -66,15 +66,13 @@ class SecurityController extends AbstractController
      */
     public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, EntityManagerInterface $entityManager, ValidatorInterface $validator, SerializerInterface $serializer)
     {
+
         $status = 'statu';
         $message = 'messages';
         $user = $this->getUser();
         $repo = $this->getDoctrine()->getRepository(Partenaire::class);
         $id = $repo->find($user);
         $part = $id;
-        $repo = $this->getDoctrine()->getRepository(Compte::class);
-        $compte = $repo->find(1);
-        $c = $compte;
         $userr = new User();
         $form = $this->createForm(UserType::class, $userr);
         $profile = new Profile();
@@ -100,7 +98,7 @@ class SecurityController extends AbstractController
         }
         $userr->setPartenaire($part);
 
-        $userr->setCompte($c);
+      //  $userr->setCompte($c);
         $errors = $validator->validate($userr);
 
         if (count($errors)) {
@@ -113,8 +111,8 @@ class SecurityController extends AbstractController
         $entityManager->flush();
 
         $data = [
-            $status => 201,
-            $message => 'l\'utilisateur a été créée avec succes'
+            'status' => 201,
+            'messages' => 'l\'utilisateur a été créée avec succes'
         ];
         return new JsonResponse($data, 201);
     }
@@ -136,7 +134,7 @@ class SecurityController extends AbstractController
         if (!$user) {
             return $this->json([
                 'code'=>'ko',
-                'message' => 'nom d\'utilisateur n\'existe pas'
+                'message' => 'Le nom d\'utilisateur n\'existe pas'
             ]);
         }
 
@@ -145,7 +143,7 @@ class SecurityController extends AbstractController
         if (!$isValid) {
             return $this->json([
                 'code'=>'ko',
-                'message' => 'Mot de passe incorect'
+                'message' => 'Le  Mot de passe  est incorect'
             ]);
         }
         if ($user->getEtat() == "bloquer") {
@@ -165,6 +163,7 @@ class SecurityController extends AbstractController
             'username' => $user->getUsername(),
             'roles'=>$user->getRoles(),
             'nom' =>$user->getNom(),
+            'imageName' =>$user->getImageName(),
             'prenom'=>$user->getPrenom(),
             'exp' => time() + 8600 // 1 day expiration
         ]);

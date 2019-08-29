@@ -58,7 +58,7 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=10 , nullable=false)
      * @Assert\NotBlank(message =" le nom ne doit pas etre vide")
      * @Groups({"lister"}),
-     *@Groups({"contrat"})
+     *@Groups({"contrat","users"})
      */
     private $nom;
 
@@ -66,7 +66,7 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=10)
      * @Assert\NotBlank(message =" le prenom ne doit pas etre vide")
      * @Groups({"lister"})
-     *@Groups({"contrat"})
+     *@Groups({"contrat","users"})
      */
     private $prenom;
 
@@ -90,14 +90,13 @@ class User implements UserInterface
      * )
      * @Groups({"lister"})
      * * @Assert\NotBlank
-     *  @Groups({"contrat"})
+     *  @Groups({"users"})
      */
     private $telephone;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Partenaire", mappedBy="createdBy")
-     *  @Groups({"contrat"})
-     * 
+     *  
      */
     private $partenaires;
     /**
@@ -135,6 +134,7 @@ class User implements UserInterface
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Partenaire", inversedBy="users")
      *  @Groups({"contrat"})
+     *    
      * 
      */
     private $partenaire;
@@ -205,7 +205,7 @@ class User implements UserInterface
     {
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
-       
+       $roles= ['ROLE_USER'];
 
 
         return array_unique($roles);
