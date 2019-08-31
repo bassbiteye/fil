@@ -22,18 +22,21 @@ class Expediteur
     /**
      * @ORM\Column(type="string", length=255)
      *  @Groups({"lister"})
+     *  @Groups({"code"})
      */
     private $nomE;
 
     /**
      * @ORM\Column(type="string", length=255)
      *   @Groups({"lister"})
+     *  @Groups({"code"})
      */
     private $prenomE;
 
     /**
      * @ORM\Column(type="integer")
      *  @Groups({"lister"})
+     *  @Groups({"code"})
      */
     private $telephoneE;
 

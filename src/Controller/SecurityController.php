@@ -91,7 +91,7 @@ class SecurityController extends AbstractController
             $userr->setRoles(["ROLE_SUPER"]);
         }
         if($profile->getLibelle()=='user'){
-            $userr->setRoles(["ROLE_USER"]);
+            $userr->setRoles(["ROLE_USERS"]);
         }
         if($profile->getLibelle()=='caissier'){
             $userr->setRoles(["ROLE_CAISSIER"]);
@@ -181,7 +181,7 @@ class SecurityController extends AbstractController
         $user = $entityManager->getRepository(User::class)->find($user->getId());
         if ($user->getUsername() == 'admin') {
             return $this->json([
-                'message' => 'cet utilisateur ne pas etre bloqué!'
+                'messages' => 'cet utilisateur ne pas etre bloqué!'
             ]);
         }
         if ($user->getEtat() == 'actif') {
@@ -193,7 +193,7 @@ class SecurityController extends AbstractController
         $entityManager->flush();
         $data = [
             'status' => 201,
-            'msg' => 'l\'utilisateur est en mode '.$user->getEtat() 
+            'messages' => 'l\'utilisateur est  '.$user->getEtat() 
         ];
         return new JsonResponse($data, 201);
     }

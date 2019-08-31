@@ -166,7 +166,7 @@ class PartenaireController extends AbstractController
 
         $data = [
             'statuss' => 201,
-            'messge' => 'Le partenaire a été créé par ' . $user->getNom() . ' ' . $user->getPrenom()
+            'messages' => 'Le partenaire a été créé par ' . $user->getNom() . ' ' . $user->getPrenom()
         ];
 
         return new JsonResponse($data, 201);
@@ -192,9 +192,9 @@ class PartenaireController extends AbstractController
         ];
         return new JsonResponse($data, 201);
     }
+
     /**
      * @Route("/depot", name="upda", methods={"POST"})
-     *@IsGranted("ROLE_CAISSIER")
      */
     public function depot(Request $request, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $entityManager)
     {
@@ -259,11 +259,23 @@ class PartenaireController extends AbstractController
             $entityManager->flush();
             $data = [
                 'status' => 200,
-                'message' => 'Le depot a éte fait avec succes ' . 'par ' . $user->getNom() . ' ' . $user->getPrenom()
+                'messages' => 'Le depot a éte fait avec succes ' . 'par ' . $user->getNom() . ' ' . $user->getPrenom()
             ];
             return new JsonResponse($data);
         }
     }
+      /**
+     * @Route("/findCompte", name="findCompte", methods={"POST"})
+     */
+    public function findCompte(Request $request, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $entityManager)
+    {
+        $values = json_decode($request->getContent());
+            $repo = $this->getDoctrine()->getRepository(Compte::class);
+            $compte = $repo->findOneBy(['numCompte' => $values->numCompte]);
+            $data  = $serializer->serialize($compte, 'json', ['groups' => ['compte']]);
+            return new Response($data, 200, []);
+  
+}
     /**
      * @Route("/addCompte", name="compte", methods={"POST"})
      * isGranted("ROLE_SUPER")

@@ -33,8 +33,6 @@ class TransactionController extends AbstractController
 {
     /**
      *@Route("/envoi", name="envoi")
-     *@IsGranted("ROLE_ADMIN")
-     *@IsGranted("ROLE_USER")
      */
     public function envoi(Request $request, EntityManagerInterface $entityentityManager, ValidatorInterface $validator, SerializerInterface $serializer)
     {
@@ -128,9 +126,25 @@ class TransactionController extends AbstractController
         return new JsonResponse($data, 201);
     }
     /**
+     * @Route("/verif", name="verifier", methods={"POST"})
+     */
+    public function verif(Request $request, SerializerInterface $serializer)
+    {
+        $values = json_decode($request->getContent());
+            $repo = $this->getDoctrine()->getRepository(Transaction::class);
+            $code = $repo->findOneBy(['codeSecret' =>$values->codeSecret]);
+            if (!$code) {
+                $data = [
+                    'status' => 500,
+                    'message' => 'le code n\'est pas valide'
+                ];
+                return new JsonResponse($data, 500);
+            }
+            $data  = $serializer->serialize($code, 'json', ['groups' => ['code']]);
+            return new Response($data, 200, []);
+}
+    /**
      * @Route("/retrait", name="retrait")
-     *  @IsGranted("ROLE_ADMIN")
-     * @IsGranted("ROLE_USER")
      */
     public function retrait(Request $request, EntityManagerInterface $entityentityManager, ValidatorInterface $validator, SerializerInterface $serializer)
     {
@@ -295,4 +309,16 @@ class TransactionController extends AbstractController
         $data      = $serializer->serialize($partenaire, 'json', ['groups' => ['lister']]);
         return new Response($data, 200, []);
     }
+     /**
+     * @Route("/verif", name="verif", methods={"POST"})
+     */
+    public function verifcode(Request $request, SerializerInterface $serializer)
+    {
+        $values = json_decode($request->getContent());
+            $repo = $this->getDoctrine()->getRepository(Transaction::class);
+            $compte = $repo->findOneBy(['codeSecret' => $values->codeSecret]);
+            $data  = $serializer->serialize($compte, 'json', ['groups' => ['compte']]);
+            return new Response($data, 200, []);
+  
+}
 }

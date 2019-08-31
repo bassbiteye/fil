@@ -26,12 +26,14 @@ class Transaction
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"code"})
      */
     private $libTransaction;
 
     /**
      * @ORM\Column(type="bigint")
      *   @Groups({"lister"})
+     *  @Groups({"code"})
      */
     private $montantTransaction;
 
@@ -42,8 +44,8 @@ class Transaction
     private $codeSecret;
 
     /**
-     * @ORM\Column(type="boolean")
-     *  
+     * @ORM\Column(type="boolean") 
+     * @Groups({"code"})
      */
     private $validate;
 
@@ -62,6 +64,7 @@ class Transaction
     /**
      * @ORM\Column(type="datetime")
      *   @Groups({"lister"})
+     *  @Groups({"code"})
      */
     private $dateEnvoi;
 
@@ -69,6 +72,7 @@ class Transaction
      * @ORM\ManyToOne(targetEntity="App\Entity\Expediteur", inversedBy="transactions")
      * @ORM\JoinColumn(nullable=false)
        * @Groups({"lister"})
+       *  @Groups({"code"})
      */
     private $expediteur;
 
@@ -76,6 +80,7 @@ class Transaction
      * @ORM\ManyToOne(targetEntity="App\Entity\Beneficiaire", inversedBy="transactions")
      * @ORM\JoinColumn(nullable=false)
      *  @Groups({"lister"})
+     * @Groups({"code"})
      */
     private $beneficiaire;
 

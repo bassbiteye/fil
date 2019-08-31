@@ -31,7 +31,8 @@ class Compte
      * @ORM\Column(type="string" , length=20)
      * @Assert\NotBlank
      * @Groups({"liste"})
-     *  * @Groups({"lister"})
+     *   @Groups({"lister"})
+      *@Groups({"compte"})
      */
     private $numCompte;
 
@@ -39,13 +40,14 @@ class Compte
      * @ORM\Column(type="bigint")
      *  @Assert\NotBlank
      * @Groups({"liste"})
-     *  * @Groups({"lister"})
+     *   @Groups({"lister"})
+     *  @Groups({"compte"})
      */
     private $solde;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Partenaire", inversedBy="comptes")
-     * @Groups({"liste"})
+     * @Groups({"compte"})
      */
     private $partenaire;
 

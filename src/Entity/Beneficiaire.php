@@ -23,18 +23,21 @@ class Beneficiaire
     /**
      * @ORM\Column(type="string", length=255)
      *  @Groups({"lister"})
+     *  @Groups({"code"})
      */
     private $nomb;
 
     /**
      * @ORM\Column(type="string", length=255)
      *   @Groups({"lister"})
+     *  @Groups({"code"})
      */
     private $prenomb;
 
     /**
      * @ORM\Column(type="integer")
      *    @Groups({"lister"})
+     *  @Groups({"code"})
      */
     private $telephoneb;
 
