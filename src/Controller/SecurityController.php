@@ -9,7 +9,9 @@ use App\Entity\Profile;
 use App\Form\ProfileType;
 
 use App\Entity\Partenaire;
+use App\Repository\CompteRepository;
 use App\Repository\ProfileRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,16 +32,26 @@ class SecurityController extends AbstractController
 {
 
     /**
-     * @Route("/admin", name="security")
+     *  @Route("/listeSysteme", name="systeme", methods={"GET"})
      */
-    public function acceuil()
-    {
-        return $this->json([
-            'messag' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/SecurityController.php',
-        ]);
-    }
+    public function systeme(EntityManagerInterface $entityManager, SerializerInterface $serializer)
+    {              
 
+        $user = $entityManager->getRepository(User::class)->getUserSystem();
+        $data      = $serializer->serialize($user, 'json', ['groups' => ['lister']]);
+        return new Response($data, 200, []);
+    }
+    /**
+     *  @Route("/listeUpart", name="userPart", methods={"GET"})
+      *@IsGranted("ROLE_ADMIN")
+     */
+    public function userPart(EntityManagerInterface $entityManager, SerializerInterface $serializer)
+    {       
+        $user1 = $this->getUser();
+        $user = $entityManager->getRepository(User::class)->getUserPart($user1->getPartenaire());
+        $data      = $serializer->serialize($user, 'json', ['groups' => ['users']]);
+        return new Response($data, 200, []);
+    }
     private $passwordEncoder;
 
     public function __construct(UserPasswordEncoderInterface $passwordEncoder)
@@ -59,7 +71,20 @@ class SecurityController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/compte", name="compte",methods={"GET"})
+     */
+    public function compt(UserRepository $compteRepository, SerializerInterface $serializer)
+    {
+        $user = $this->getUser();
 
+        $compte = $compteRepository->find($user);
+       $data = $serializer->serialize($compte, 'json', ['groups' => ['affect']]);
+
+        return new Response($data, 200, [
+            'Content-Type' => 'application/json'
+        ]);
+    }
 
     /**
      * @Route("/register", name="register", methods={"POST"})
@@ -174,7 +199,7 @@ class SecurityController extends AbstractController
     }
 
     /**
-     * @Route("/etat/{id}", name="user", methods={"PUT"})
+     * @Route("/etat/{id}", name="u", methods={"PUT"})
      */
     public function update(Request $request, SerializerInterface $serializer, User $user, ValidatorInterface $validator, EntityManagerInterface $entityManager)
     {
@@ -202,23 +227,38 @@ class SecurityController extends AbstractController
      */
     public function affecter(Request $request, SerializerInterface $serializer, User $user, ValidatorInterface $validator, EntityManagerInterface $entityManager)
     {
-        $user = $entityManager->getRepository(User::class)->find($user->getId());
-        if ($user->getUsername() == 'admin') {
-            return $this->json([
-                'message' => 'cet utilisateur ne pas etre bloqué!'
+        $values = json_decode($request->getContent());
+        $repo = $this->getDoctrine()->getRepository(User::class);
+        $code = $repo->findOneBy(['commpte' =>$values->codeSecret]);
+   
+    }  
+    /**
+     * @Route("/updateUser/{id}", name="updateu", methods={"PUT"})
+     */
+    public function modifU(Request $request, SerializerInterface $serializer, User $user, ValidatorInterface $validator, EntityManagerInterface $entityManager)
+    {
+        $UserUpdate = $entityManager->getRepository(User::class)->find($user->getId());
+        $data = json_decode($request->getContent());
+        foreach ($data as $key => $value){
+            if($key && !empty($value)) {
+                $name = ucfirst($key);
+                $setter = 'set'.$name;
+                $UserUpdate->$setter($value);
+            }
+        }
+        $errors = $validator->validate($UserUpdate);
+        if(count($errors)) {
+            $errors = $serializer->serialize($errors, 'json');
+            return new Response($errors, 500, [
+                'Content-Type' => 'application/json'
             ]);
         }
-        if ($user->getEtat() == 'actif') {
-            $user->setEtat('bloquer');
-        } else if ($user->getEtat() == 'bloquer') {
-            $user->setEtat('actif');
-        }
-        $entityManager->persist($user);
         $entityManager->flush();
         $data = [
-            'status' => 201,
-            'msg' => 'l\'utilisateur est en mode '.$user->getEtat() 
+            'status' => 200,
+            'message' => 'L\'utilisateur a bien été mis à jour'
         ];
-        return new JsonResponse($data, 201);
-    }  
+        return new JsonResponse($data);
+    }
+
 }

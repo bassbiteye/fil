@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Controller;
-
+use App\Entity\User;
 use App\Entity\Tarifs;
 use App\Entity\ComEtat;
 use App\Entity\Expediteur;
@@ -207,7 +207,7 @@ class TransactionController extends AbstractController
         $entityentityManager->flush();
         $data = [
             'statuss' => 201,
-            'messge' => 'Le retrait a ete fait avec succes ' . $user->getNom() . ' ' . $user->getPrenom()
+            'messge' => 'Le retrait a ete fait avec succes ' 
         ];
         return new JsonResponse($data, 201);
     }
@@ -297,9 +297,9 @@ class TransactionController extends AbstractController
     }
 
     /**
-     *  @Route("/users", name="users", methods={"GET"})
+     *  @Route("/partenaire", name="partenaires", methods={"GET"})
      */
-    public function show(UserRepository $userRepository, SerializerInterface $serializer)
+    public function part(UserRepository $userRepository, SerializerInterface $serializer)
     {
         $user = $this->getUser();
 
@@ -307,6 +307,19 @@ class TransactionController extends AbstractController
         $partenaire = $repo->find($user->getPartenaire());
 
         $data      = $serializer->serialize($partenaire, 'json', ['groups' => ['lister']]);
+        return new Response($data, 200, []);
+    }
+     /**
+     *  @Route("/use", name="user", methods={"GET"})
+     */
+    public function user( SerializerInterface $serializer)
+    {
+        $user = $this->getUser();
+
+        $repo = $this->getDoctrine()->getRepository(User::class);
+        $user = $repo->find($user);
+
+        $data      = $serializer->serialize($user, 'json', ['groups' => ['users']]);
         return new Response($data, 200, []);
     }
      /**

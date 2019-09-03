@@ -29,6 +29,7 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"contrat","users"})
      */
     private $id;
 
@@ -89,14 +90,14 @@ class User implements UserInterface
      * message="cette valeur doit être positive"
      * )
      * @Groups({"lister"})
-     * * @Assert\NotBlank
+     *  @Assert\NotBlank
      *  @Groups({"users"})
      */
     private $telephone;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Partenaire", mappedBy="createdBy")
-     *  
+     * 
      */
     private $partenaires;
     /**
@@ -134,21 +135,21 @@ class User implements UserInterface
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Partenaire", inversedBy="users")
      *  @Groups({"contrat"})
-     *    
-     * 
+     * @Groups({"affect"})
+     * affect 
      */
     private $partenaire;
 
     /**
      * @ORM\Column(type="string", length=10)
      * @Groups({"lister"})
-     *  @Groups({"contrat"})
+       *@Groups({"contrat","users"})
      */
     private $etat;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Compte", inversedBy="users")
-  
+       *@Groups({"contrat","users"})
      */
     private $Compte;
 

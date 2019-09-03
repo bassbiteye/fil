@@ -59,9 +59,20 @@ class PartenaireController extends AbstractController
      *  @Route("/liste", name="liste", methods={"GET"})
       *@IsGranted("ROLE_SUPER")
      */
-    public function show(PartenaireRepository $partenaireRepository, SerializerInterface $serializer)
-    {
-        $partenaire = $partenaireRepository->findAll();
+    public function show(PartenaireRepository $partenaireRepository,EntityManagerInterface $entityManager, SerializerInterface $serializer)
+    {        $user = $this->getUser();
+        $partenaire = $entityManager->getRepository(Partenaire::class)->findBy((['createdBy' => $user]));
+
+        $data      = $serializer->serialize($partenaire, 'json', ['groups' => ['listeP']]);
+        return new Response($data, 200, []);
+    }
+    /**
+     *  @Route("/listeSysteme", name="systeme", methods={"GET"})
+      *@IsGranted("ROLE_SUPER")
+     */
+    public function systeme(EntityManagerInterface $entityManager, SerializerInterface $serializer)
+    {        $user = $this->getUser();
+        $partenaire = $entityManager->getRepository(User::class)->getUserSystem();
 
         $data      = $serializer->serialize($partenaire, 'json', ['groups' => ['lister']]);
         return new Response($data, 200, []);
@@ -188,7 +199,7 @@ class PartenaireController extends AbstractController
         $entityManager->flush();
         $data = [
             'status' => 201,
-            'msg' => 'le partenaire est en mode  '.$partenaire->getEtat()
+            'messages' => 'le partenaire est en mode  '.$partenaire->getEtat()
         ];
         return new JsonResponse($data, 201);
     }
@@ -264,7 +275,7 @@ class PartenaireController extends AbstractController
             return new JsonResponse($data);
         }
     }
-      /**
+   /**
      * @Route("/findCompte", name="findCompte", methods={"POST"})
      */
     public function findCompte(Request $request, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $entityManager)
@@ -276,6 +287,31 @@ class PartenaireController extends AbstractController
             return new Response($data, 200, []);
   
 }
+
+  /**
+     * @Route("/findPar", name="findPartenaire", methods={"POST"})
+     */
+    public function findPartenaire(Request $request, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $entityManager)
+    {
+        $values = json_decode($request->getContent());
+    
+            $repo = $this->getDoctrine()->getRepository(Partenaire::class);
+            $partenaire = $repo->findOneBy(['ninea' => $values->ninea]);
+         
+            if (!$partenaire) {
+                $data = [
+                    'status' => 500,
+                    'message' => 'le code n\'est pas valide'
+                ];
+                return new JsonResponse($data, 500);
+            }
+            $data  = $serializer->serialize($partenaire, 'json', ['groups' => ['lister']]);
+            return new Response($data, 200, []);
+ }
+
+
+          
+
     /**
      * @Route("/addCompte", name="compte", methods={"POST"})
      * isGranted("ROLE_SUPER")
@@ -334,9 +370,40 @@ class PartenaireController extends AbstractController
 
         $entityManager->flush();
         $data = [
+            'num' => $compte->getNumCompte(),
             'status' => 200,
-            'message' => 'Le nouveau compte a bien été ajouté ' . 'par ' . $user->getNom() . ' ' . $user->getPrenom()
+            'message' => 'Le nouveau compte a bien été ajouté ',
+            
+        ];
+        return new JsonResponse($data, 201);
+    }
+    /**
+     * @Route("/updateP/{id}", name="updatep", methods={"PUT"})
+     */
+    public function modifP(Request $request, SerializerInterface $serializer, Partenaire $partenaire, ValidatorInterface $validator, EntityManagerInterface $entityManager)
+    {
+        $partUpdate = $entityManager->getRepository(Partenaire::class)->find($partenaire->getId());
+        $data = json_decode($request->getContent());
+        foreach ($data as $key => $value){
+            if($key && !empty($value)) {
+                $name = ucfirst($key);
+                $setter = 'set'.$name;
+                $partUpdate->$setter($value);
+            }
+        }
+        $errors = $validator->validate($partUpdate);
+        if(count($errors)) {
+            $errors = $serializer->serialize($errors, 'json');
+            return new Response($errors, 500, [
+                'Content-Type' => 'application/json'
+            ]);
+        }
+        $entityManager->flush();
+        $data = [
+            'status' => 200,
+            'message' => 'Le partenaire a bien été mis à jour'
         ];
         return new JsonResponse($data);
     }
+
 }

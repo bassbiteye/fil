@@ -19,7 +19,7 @@ class Compte
     {
         return $this->numCompte;
     }
-        // ...
+    // ...
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -32,7 +32,9 @@ class Compte
      * @Assert\NotBlank
      * @Groups({"liste"})
      *   @Groups({"lister"})
-      *@Groups({"compte"})
+     *@Groups({"compte"})
+     *@Groups({"affect"})
+      * @Groups({"contrat","users"})
      */
     private $numCompte;
 

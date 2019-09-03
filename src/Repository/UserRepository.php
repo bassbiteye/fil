@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use phpDocumentor\Reflection\Types\Null_;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -22,7 +23,7 @@ class UserRepository extends ServiceEntityRepository
     /**
      * @return User[] Returns an array of User objects
      */
-    
+
     public function findByExampleField($value)
     {
         return $this->createQueryBuilder('u')
@@ -31,21 +32,35 @@ class UserRepository extends ServiceEntityRepository
             ->orderBy('u.id', 'ASC')
             ->setMaxResults(1)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
 
 
-    
+
     public function findOneBySomeField($value): ?User
     {
         return $this->createQueryBuilder('u')
             ->andWhere('u.id = :val')
             ->setParameter('val', $value)
-    
+
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getOneOrNullResult();
     }
-    
+    public function getUserSystem()
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.partenaire IS NULL')
+            ->getQuery()
+            ->getResult();
+    }
+    public function getUserPart($user)
+    {
+        return $this->createQueryBuilder('u')
+            ->Where('u.partenaire = :val')
+            ->setParameter('val', $user)
+            ->getQuery()
+            ->getResult();
+
+       
+    }
 }

@@ -34,6 +34,7 @@ class Partenaire
      * @ORM\Column(type="integer")
      *@Groups({"lister"})
      *@Groups({"contrat"})
+      *@Groups({"listeP"})
      */
     private $id;
 
@@ -50,6 +51,7 @@ class Partenaire
      *@Groups({"lister"})
      *@Groups({"contrat"})
       *@Groups({"compte"})
+      *@Groups({"listeP"})
      */
     private $raisonSocial;
 
@@ -65,6 +67,8 @@ class Partenaire
      * @Groups({"lister"})
      *@Groups({"contrat"})
       *@Groups({"compte"})
+      *@Groups({"listeP"})
+
      */
     private $adresse;
 
@@ -81,13 +85,17 @@ class Partenaire
      * @Groups({"lister"})
      *@Groups({"contrat"})
       *@Groups({"compte"})
+      * @Groups({"users"})
+      *@Groups({"listeP"})
+
      */
     private $ninea;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="partenaires")
      * @ORM\JoinColumn(nullable=false)
-
+     * @Groups({"lister"})
+     * @Groups({"listeP"})
      */
     private $createdBy;
 
@@ -95,12 +103,14 @@ class Partenaire
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="partenaire")
       *@Groups({"contrat"})
       *  @Groups({"lister"})
+      
      */
     private $users;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Compte", mappedBy="partenaire")
     * @Groups({"lister"})
+    * @Groups({"affect"})    
      */
     private $comptes;
 
@@ -108,8 +118,26 @@ class Partenaire
      * @ORM\Column(type="string", length=10)
      *  @Groups({"lister"})
      *@Groups({"contrat"})
+      *@Groups({"listeP"})
      */
     private $etat;
+
+    /**
+     * @ORM\Column(type="text")
+     */
+    private $Description;
+
+    /**
+     * @ORM\Column(type="string", length=50)
+     * @Groups({"listeP"})
+     */
+    private $mail;
+
+    /**
+     * @ORM\Column(type="integer")
+     * @Groups({"listeP"})
+     */
+    private $fix;
 
     public function __construct()
     {
@@ -240,6 +268,42 @@ class Partenaire
     public function setEtat(string $etat): self
     {
         $this->etat = $etat;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->Description;
+    }
+
+    public function setDescription(string $Description): self
+    {
+        $this->Description = $Description;
+
+        return $this;
+    }
+
+    public function getMail(): ?string
+    {
+        return $this->mail;
+    }
+
+    public function setMail(string $mail): self
+    {
+        $this->mail = $mail;
+
+        return $this;
+    }
+
+    public function getFix(): ?int
+    {
+        return $this->fix;
+    }
+
+    public function setFix(int $fix): self
+    {
+        $this->fix = $fix;
 
         return $this;
     }

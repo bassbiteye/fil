@@ -7,8 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 class PartenaireType extends AbstractType
 {
@@ -16,8 +15,11 @@ class PartenaireType extends AbstractType
     {
         $builder
             ->add('raisonSocial',TextType::class)
-            ->add('adresse')
-            ->add('ninea')
+            ->add('adresse',TextType::class)
+            ->add('ninea',NumberType::class)
+            ->add('fix',NumberType::class)
+            ->add('mail',TextType::class)
+            ->add('Description',TextType::class)
          
         ;
     }
