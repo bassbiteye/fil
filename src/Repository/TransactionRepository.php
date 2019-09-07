@@ -72,4 +72,38 @@ class TransactionRepository extends ServiceEntityRepository
         ;
     }
     */
+    public function getByDate($debut ,$fin,$user)
+{
+    $from = new \DateTime($debut->format("Y-m-d")." 00:00:00");
+    $to   = new \DateTime($fin->format("Y-m-d")." 23:59:59");
+
+    $qb = $this->createQueryBuilder("t");
+    $qb
+        ->andWhere('t.dateEnvoi BETWEEN :from AND :to')
+        ->setParameter('from', $from )
+        ->setParameter('to', $to)
+        ->andWhere('t.user = :val')
+        ->setParameter('val', $user)
+    ;
+    $result = $qb->getQuery()->getResult();
+
+    return $result;
+}
+public function finByDateR($debut ,$fin,$user)
+{
+    $from = new \DateTime($debut->format("Y-m-d")." 00:00:00");
+    $to   = new \DateTime($fin->format("Y-m-d")." 23:59:59");
+
+    $qb = $this->createQueryBuilder("t");
+    $qb
+        ->andWhere('t.dateRetrait BETWEEN :from AND :to')
+        ->setParameter('from', $from )
+        ->setParameter('to', $to)
+        ->andWhere('t.user = :val')
+        ->setParameter('val', $user)
+    ;
+    $result = $qb->getQuery()->getResult();
+
+    return $result;
+}
 }

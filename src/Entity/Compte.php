@@ -34,7 +34,7 @@ class Compte
      *   @Groups({"lister"})
      *@Groups({"compte"})
      *@Groups({"affect"})
-      * @Groups({"contrat","users"})
+      *@Groups({"contrat","users"})
      */
     private $numCompte;
 
@@ -42,8 +42,9 @@ class Compte
      * @ORM\Column(type="bigint")
      *  @Assert\NotBlank
      * @Groups({"liste"})
-     *   @Groups({"lister"})
-     *  @Groups({"compte"})
+     * @Groups({"lister"})
+     *@Groups({"compte"})
+     * @Groups({"contrat","users"})
      */
     private $solde;
 

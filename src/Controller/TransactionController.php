@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\DependencyInjection\Dumper\Dumper;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -31,6 +32,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class TransactionController extends AbstractController
 {
+    public $dateFrom;
+    private $dateTo;
+    public function __construct()
+    {
+        $this->dateFrom='dateFrom';
+        $this->dateTo='dateTo';
+    }
     /**
      *@Route("/envoi", name="envoi")
      */
@@ -121,7 +129,7 @@ class TransactionController extends AbstractController
         $entityentityManager->flush();
         $data = [
             'statuss1' => 201,
-            'message1' => 'Le transaction a ete fait avec succes ' . $user->getNom() . ' ' . $user->getPrenom()
+            'message1' => 'Le transaction a ete fait avec succes ' 
         ];
         return new JsonResponse($data, 201);
     }
@@ -207,44 +215,12 @@ class TransactionController extends AbstractController
         $entityentityManager->flush();
         $data = [
             'statuss' => 201,
+            'transations' =>$transaction,
             'messge' => 'Le retrait a ete fait avec succes ' 
         ];
         return new JsonResponse($data, 201);
     }
-    /**
-     * @Route("/operation", name="operation",methods={"POST"})
-     */
-    public function operation(Request $request, EntityManagerInterface $entityentityManager, ValidatorInterface $validator, SerializerInterface $serializer)
-    {
-
-        $user = $this->getUser();
-        $values = json_decode($request->getContent());
-        $debut = new \DateTime($values->datedebut);
-        $fin = new \DateTime($values->datefin);
-        try {
-            $repo1 = $this->getDoctrine()->getRepository(Transaction::class);
-
-            //$use = $repo1->findBy(['user'=>$user]);
-
-            $transactionstab = $this->transDate($repo1, $debut, $fin);
-            if ($transactionstab == []) {
-                return $this->json([
-                    'message' => 'aucune transaction pour cette intervale!'
-                ]);
-            }
-        } catch (ParseException $exception) {
-            $exception = [
-                'status' => 500,
-                'message' => 'Vous devez renseigner les tous  champs'
-            ];
-            return new JsonResponse($exception, 500);
-        }
-        $data      = $serializer->serialize($transactionstab, 'json', ['groups' => ['lister']]);
-        return new Response($data, 200, [
-            'Content-Type' => 'application/json'
-        ]);
-    }
-
+    
     public function transDate(TransactionRepository $repo, $debut, $fin)
     {
 
@@ -262,40 +238,7 @@ class TransactionController extends AbstractController
 
         return $transactions;
     }
-    /**
-     * @Route("/operationPar", name="operationPar",methods={"POST"})
-     * @IsGranted("ROLE_ADMIN")
-     */
-    public function operationPar(Request $request, EntityManagerInterface $entityentityManager, ValidatorInterface $validator, SerializerInterface $serializer)
-    {
-
-        $user = $this->getUser();
-     
-        try {
-
-            $repo = $this->getDoctrine()->getRepository(Partenaire::class);
-            $partenaire = $repo->find($user->getPartenaire());
-      
-            if (!$partenaire) {
-                $exception = [
-                    'status' => 500,
-                    'message' => 'le partenaire n\'existe pas   '
-                ];
-                return new JsonResponse($exception, 500);
-            }
-        } catch (ParseException $exception) {
-            $exception = [
-                'status' => 500,
-                'message' => 'Vous devez renseigner les tous  champs'
-            ];
-            return new JsonResponse($exception, 500);
-        }
-        $data      = $serializer->serialize($partenaire, 'json', ['groups' => ['lister']]);
-        return new Response($data, 200, [
-            'Content-Type' => 'application/json'
-        ]);
-    }
-
+   
     /**
      *  @Route("/partenaire", name="partenaires", methods={"GET"})
      */
@@ -332,6 +275,78 @@ class TransactionController extends AbstractController
             $compte = $repo->findOneBy(['codeSecret' => $values->codeSecret]);
             $data  = $serializer->serialize($compte, 'json', ['groups' => ['compte']]);
             return new Response($data, 200, []);
-  
 }
+ /**
+     * @Route("/detailEnvoi", name="detailEnv",methods={"POST"})
+     */
+    public function detailEnvi(Request $request, EntityManagerInterface $entityentityManager, ValidatorInterface $validator, SerializerInterface $serializer)
+    {
+
+        $user = $this->getUser();
+        $values = json_decode($request->getContent());
+        if(!$values){
+            $values=$request->request->all();
+        }
+        $debut= new \DateTime($values[$this->dateFrom]);
+        $fin= new \DateTime($values[$this->dateTo]);
+
+
+        try {
+            $repo1 = $this->getDoctrine()->getRepository(Transaction::class);
+            $detail =$repo1->getByDate($debut,$fin,$user);
+            if ($detail == []) {
+                return $this->json([
+                    'message' => 'aucune transaction pour cette intervale!'
+                ]);
+            }
+        } catch (ParseException $exception) {
+            $exception = [
+                'status' => 500,
+                'message' => 'Vous devez renseigner les tous  champs'
+            ];
+            return new JsonResponse($exception, 500);
+        }
+        $data      = $serializer->serialize($detail, 'json', ['groups' => ['lister']]);
+        return new Response($data, 200, [
+            'Content-Type' => 'application/json'
+        ]);
+    }
+ /**
+     * @Route("/detailRetrait", name="detailRetrai",methods={"POST"})
+     */
+    public function detailRetra(Request $request, EntityManagerInterface $entityentityManager, ValidatorInterface $validator, SerializerInterface $serializer)
+    {
+
+        $user = $this->getUser();
+        $values = json_decode($request->getContent());
+        if(!$values){
+            $values=$request->request->all();
+        }
+        $debut= new \DateTime($values[$this->dateFrom]);
+        $fin= new \DateTime($values[$this->dateTo]);
+
+
+        try {
+            $repo1 = $this->getDoctrine()->getRepository(Transaction::class);
+            $detail =$repo1->finByDateR($debut,$fin,$user);
+            if ($detail == []) {
+                return $this->json([
+                    'message' => 'aucune transaction pour cette intervale!'
+                ]);
+            }
+        } catch (ParseException $exception) {
+            $exception = [
+                'status' => 500,
+                'message' => 'Vous devez renseigner les tous  champs'
+            ];
+            return new JsonResponse($exception, 500);
+        }
+        $data      = $serializer->serialize($detail, 'json', ['groups' => ['lister']]);
+        return new Response($data, 200, [
+            'Content-Type' => 'application/json'
+        ]);
+    }
+ 
+   
+
 }

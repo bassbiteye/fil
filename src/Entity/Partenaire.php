@@ -52,6 +52,8 @@ class Partenaire
      *@Groups({"contrat"})
       *@Groups({"compte"})
       *@Groups({"listeP"})
+      * @Groups({"users"})
+
      */
     private $raisonSocial;
 
@@ -68,6 +70,7 @@ class Partenaire
      *@Groups({"contrat"})
       *@Groups({"compte"})
       *@Groups({"listeP"})
+      * @Groups({"users"})
 
      */
     private $adresse;

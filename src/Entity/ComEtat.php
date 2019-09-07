@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ComEtatRepository")
@@ -18,6 +19,7 @@ class ComEtat
 
     /**
      * @ORM\Column(type="bigint")
+   *  @Groups({"lister"})
      */
     private $commission;
 

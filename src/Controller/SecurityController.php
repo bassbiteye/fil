@@ -52,6 +52,16 @@ class SecurityController extends AbstractController
         $data      = $serializer->serialize($user, 'json', ['groups' => ['users']]);
         return new Response($data, 200, []);
     }
+   /**
+     *@Route("/info", name="info", methods={"GET"})
+     */
+    public function infoU(EntityManagerInterface $entityManager, SerializerInterface $serializer)
+    {       
+        $user1 = $this->getUser();
+        $user = $entityManager->getRepository(User::class)->getInfo($user1->getCompte(),$user1->getId());
+        $data      = $serializer->serialize($user, 'json', ['groups' => ['users']]);
+        return new Response($data, 200, []);
+    }
     private $passwordEncoder;
 
     public function __construct(UserPasswordEncoderInterface $passwordEncoder)
@@ -122,8 +132,6 @@ class SecurityController extends AbstractController
             $userr->setRoles(["ROLE_CAISSIER"]);
         }
         $userr->setPartenaire($part);
-
-      //  $userr->setCompte($c);
         $errors = $validator->validate($userr);
 
         if (count($errors)) {

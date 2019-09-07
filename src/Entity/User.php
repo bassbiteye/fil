@@ -136,7 +136,7 @@ class User implements UserInterface
      * @ORM\ManyToOne(targetEntity="App\Entity\Partenaire", inversedBy="users")
      *  @Groups({"contrat"})
      * @Groups({"affect"})
-     * affect 
+     *@Groups({"contrat","users"}) 
      */
     private $partenaire;
 
@@ -161,6 +161,7 @@ class User implements UserInterface
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="user")
      * @Groups({"lister"})
+     * @Groups({"contrat","users"})
      */
     private $transactions;
 

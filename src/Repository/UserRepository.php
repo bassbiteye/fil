@@ -42,7 +42,6 @@ class UserRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('u')
             ->andWhere('u.id = :val')
             ->setParameter('val', $value)
-
             ->getQuery()
             ->getOneOrNullResult();
     }
@@ -63,4 +62,17 @@ class UserRepository extends ServiceEntityRepository
 
        
     }
+    public function getInfo($user,$id)
+    {
+        return $this->createQueryBuilder('u')
+            ->Where('u.id = :val1')
+            ->setParameter('val1', $id)
+            ->andWhere('u.Compte = :val')
+            ->setParameter('val', $user)
+            ->getQuery()
+            ->getResult();
+
+       
+    }
+    
 }

@@ -21,12 +21,14 @@ class Transaction
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"users"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"code"})
+     
      */
     private $libTransaction;
 
@@ -87,23 +89,25 @@ class Transaction
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="transactions")
      * @ORM\JoinColumn(nullable=false)
-   
      */
     private $user;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Tarifs", inversedBy="transactions")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"lister"})
      */
     private $tarifs;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\ComProprietaire", mappedBy="transaction")
+     *@Groups({"lister"})
      */
     private $comProprietaires;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\ComEtat", mappedBy="transaction")
+     *@Groups({"lister"})
      */
     private $comEtats;
 
