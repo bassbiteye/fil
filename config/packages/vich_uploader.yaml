@@ -3,8 +3,8 @@ vich_uploader:
 
     mappings:
        User:
-           uri_prefix: /images/User
-           upload_destination: '%kernel.project_dir%/public/images/User'
+           uri_prefix: /assets/img
+           upload_destination: '%kernel.project_dir%/../filrouge/src/assets/img'
            
            inject_on_load: false
            delete_on_update: true

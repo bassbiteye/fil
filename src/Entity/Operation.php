@@ -52,6 +52,8 @@ class Operation
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="operations")
+    * @Groups({"liste"})
+
      */
     private $caissier;
 

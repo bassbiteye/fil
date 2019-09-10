@@ -22,17 +22,21 @@ class Tarifs
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"trans"})
      */
     private $min;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"trans"})
      */
     private $max;
 
     /**
      * @ORM\Column(type="integer")
      *@Groups({"lister"})
+    * @Groups({"trans"})
+
      */
     private $frais;
 

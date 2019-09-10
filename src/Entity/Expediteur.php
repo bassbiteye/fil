@@ -23,6 +23,8 @@ class Expediteur
      * @ORM\Column(type="string", length=255)
      *  @Groups({"lister"})
      *  @Groups({"code"})
+     *  @Groups({"trans"})
+
      */
     private $nomE;
 
@@ -30,6 +32,8 @@ class Expediteur
      * @ORM\Column(type="string", length=255)
      *   @Groups({"lister"})
      *  @Groups({"code"})
+     *   @Groups({"trans"})
+
      */
     private $prenomE;
 
@@ -37,6 +41,8 @@ class Expediteur
      * @ORM\Column(type="integer")
      *  @Groups({"lister"})
      *  @Groups({"code"})
+          * @Groups({"trans"})
+
      */
     private $telephoneE;
 

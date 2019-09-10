@@ -24,12 +24,16 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  */
 class User implements UserInterface
 {
-    
+    public function __toString()
+    {
+        return $this->nom;
+    }
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      * @Groups({"contrat","users"})
+     * @Groups({"lister"})
      */
     private $id;
 
@@ -37,7 +41,7 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=20,nullable=false)
     
      * @Assert\NotBlank(message =" le username ne doit pas etre vide")
-     * @Groups({"lister"}),
+     * @Groups({"lister"})
      * @Groups({"contrat"})
      */
     private $username;
@@ -45,6 +49,9 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="json")
      *@Assert\NotBlank(message =" le role ne doit pas etre vide")
+     * @Groups({"lister"})
+     *@Groups({"contrat","users"})
+
      */
     private $roles = [];
 
@@ -60,6 +67,8 @@ class User implements UserInterface
      * @Assert\NotBlank(message =" le nom ne doit pas etre vide")
      * @Groups({"lister"}),
      *@Groups({"contrat","users"})
+     * @Groups({"trans"})
+
      */
     private $nom;
 
@@ -68,6 +77,7 @@ class User implements UserInterface
      * @Assert\NotBlank(message =" le prenom ne doit pas etre vide")
      * @Groups({"lister"})
      *@Groups({"contrat","users"})
+     * @Groups({"trans"})
      */
     private $prenom;
 
@@ -92,6 +102,7 @@ class User implements UserInterface
      * @Groups({"lister"})
      *  @Assert\NotBlank
      *  @Groups({"users"})
+     * @Groups({"liste"})
      */
     private $telephone;
 
@@ -137,19 +148,20 @@ class User implements UserInterface
      *  @Groups({"contrat"})
      * @Groups({"affect"})
      *@Groups({"contrat","users"}) 
+     * @Groups({"lister"})
      */
     private $partenaire;
 
     /**
      * @ORM\Column(type="string", length=10)
      * @Groups({"lister"})
-       *@Groups({"contrat","users"})
+     *@Groups({"contrat","users"})
      */
     private $etat;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Compte", inversedBy="users")
-       *@Groups({"contrat","users"})
+     *@Groups({"contrat","users"})
      */
     private $Compte;
 
@@ -207,7 +219,7 @@ class User implements UserInterface
     {
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
-     
+
 
 
         return array_unique($roles);
@@ -406,7 +418,7 @@ class User implements UserInterface
 
     public function getImageFile(): ?File
     {
-        return $this->imageFile; 
+        return $this->imageFile;
     }
 
     public function setImageName(?string $imageName): void
@@ -480,5 +492,4 @@ class User implements UserInterface
 
         return $this;
     }
-    
 }

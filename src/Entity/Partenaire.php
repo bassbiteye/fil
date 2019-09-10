@@ -53,7 +53,6 @@ class Partenaire
       *@Groups({"compte"})
       *@Groups({"listeP"})
       * @Groups({"users"})
-
      */
     private $raisonSocial;
 
@@ -71,7 +70,6 @@ class Partenaire
       *@Groups({"compte"})
       *@Groups({"listeP"})
       * @Groups({"users"})
-
      */
     private $adresse;
 
@@ -87,10 +85,9 @@ class Partenaire
      * )
      * @Groups({"lister"})
      *@Groups({"contrat"})
-      *@Groups({"compte"})
-      * @Groups({"users"})
-      *@Groups({"listeP"})
-
+     *@Groups({"compte"})
+     * @Groups({"users"})
+     *@Groups({"listeP"})
      */
     private $ninea;
 
@@ -106,7 +103,6 @@ class Partenaire
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="partenaire")
       *@Groups({"contrat"})
       *  @Groups({"lister"})
-      
      */
     private $users;
 
@@ -114,6 +110,8 @@ class Partenaire
      * @ORM\OneToMany(targetEntity="App\Entity\Compte", mappedBy="partenaire")
     * @Groups({"lister"})
     * @Groups({"affect"})    
+    *@Groups({"listeP"})
+
      */
     private $comptes;
 

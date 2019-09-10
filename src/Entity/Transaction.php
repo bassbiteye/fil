@@ -28,20 +28,23 @@ class Transaction
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"code"})
-     
+     * @Groups({"trans","users"})
+
      */
     private $libTransaction;
 
     /**
      * @ORM\Column(type="bigint")
-     *   @Groups({"lister"})
+     *   @Groups({"trans"})
      *  @Groups({"code"})
+     *  @Groups({"trans","users"})
+
      */
     private $montantTransaction;
 
     /**
      * @ORM\Column(type="bigint")
-     *   @Groups({"lister"})
+     *   @Groups({"trans"})
      */
     private $codeSecret;
 
@@ -53,66 +56,78 @@ class Transaction
 
     /**
      * @ORM\Column(type="bigint", nullable=true)
-     *   @Groups({"lister"})
+     *   @Groups({"trans"})
      */
     private $cni;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     *   @Groups({"lister"})
+     *   @Groups({"trans"})
+     *  @Groups({"trans","users"})
+
      */
     private $dateRetrait;
 
     /**
      * @ORM\Column(type="datetime")
-     *   @Groups({"lister"})
+     *   @Groups({"trans"})
      *  @Groups({"code"})
+     * @Groups({"trans","users"})
      */
     private $dateEnvoi;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Expediteur", inversedBy="transactions")
      * @ORM\JoinColumn(nullable=false)
-       * @Groups({"lister"})
+       * @Groups({"trans"})
        *  @Groups({"code"})
+      * @Groups({"trans","users"})
+
      */
     private $expediteur;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Beneficiaire", inversedBy="transactions")
      * @ORM\JoinColumn(nullable=false)
-     *  @Groups({"lister"})
+     *  @Groups({"trans"})
      * @Groups({"code"})
+     * @Groups({"contrat","users"})
+
      */
     private $beneficiaire;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="transactions")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"trans"})
+
      */
     private $user;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Tarifs", inversedBy="transactions")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"lister"})
+     * @Groups({"trans"})
+     *  @Groups({"contrat","users"})
+
      */
     private $tarifs;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\ComProprietaire", mappedBy="transaction")
-     *@Groups({"lister"})
+     *@Groups({"trans"})
      */
     private $comProprietaires;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\ComEtat", mappedBy="transaction")
-     *@Groups({"lister"})
+     *@Groups({"trans"})
      */
     private $comEtats;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="retrait")
+     * @Groups({"trans"})
      */
     private $userRetrait;
 

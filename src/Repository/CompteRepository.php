@@ -47,4 +47,14 @@ class CompteRepository extends ServiceEntityRepository
         ;
     }
     */
+    public function getUserPart($user)
+    {
+        return $this->createQueryBuilder('u')
+            ->Where('u.partenaire = :val')
+            ->setParameter('val', $user)
+            ->getQuery()
+            ->getResult();
+
+       
+    }
 }

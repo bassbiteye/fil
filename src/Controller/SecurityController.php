@@ -101,9 +101,6 @@ class SecurityController extends AbstractController
      */
     public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, EntityManagerInterface $entityManager, ValidatorInterface $validator, SerializerInterface $serializer)
     {
-
-        $status = 'statu';
-        $message = 'messages';
         $user = $this->getUser();
         $repo = $this->getDoctrine()->getRepository(Partenaire::class);
         $id = $repo->find($user);
@@ -209,7 +206,7 @@ class SecurityController extends AbstractController
     /**
      * @Route("/etat/{id}", name="u", methods={"PUT"})
      */
-    public function update(Request $request, SerializerInterface $serializer, User $user, ValidatorInterface $validator, EntityManagerInterface $entityManager)
+    public function update(User $user, EntityManagerInterface $entityManager)
     {
         $user = $entityManager->getRepository(User::class)->find($user->getId());
         if ($user->getUsername() == 'admin') {
@@ -231,14 +228,26 @@ class SecurityController extends AbstractController
         return new JsonResponse($data, 201);
     }
     /**
-     * @Route("/affecter/{id}", name="user", methods={"PUT"})
+     * @Route("/affecter/{id}", name="aff", methods={"POST"})
      */
     public function affecter(Request $request, SerializerInterface $serializer, User $user, ValidatorInterface $validator, EntityManagerInterface $entityManager)
     {
         $values = json_decode($request->getContent());
-        $repo = $this->getDoctrine()->getRepository(User::class);
-        $code = $repo->findOneBy(['commpte' =>$values->codeSecret]);
-   
+        $user = $entityManager->getRepository(User::class)->find($user->getId());
+        $compte = $entityManager->getRepository(Compte::class)->findOneBy(['numCompte' =>$values->numCompte]);
+       if(!$compte){
+        return $this->json([
+            'messages' => 'compte introuvable!'
+        ]);
+       }
+        $user->setCompte($compte);
+        $entityManager->persist($user);
+        $entityManager->flush();
+        $data = [
+            'status' => 201,
+            'messages' => 'le compte a ete affecté avec sucess  '.$user->getEtat() 
+        ];
+        return new JsonResponse($data, 201);
     }  
     /**
      * @Route("/updateUser/{id}", name="updateu", methods={"PUT"})
@@ -268,5 +277,6 @@ class SecurityController extends AbstractController
         ];
         return new JsonResponse($data);
     }
+  
 
 }

@@ -35,6 +35,8 @@ class Compte
      *@Groups({"compte"})
      *@Groups({"affect"})
       *@Groups({"contrat","users"})
+    *@Groups({"listeP"})
+
      */
     private $numCompte;
 

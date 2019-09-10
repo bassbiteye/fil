@@ -8,8 +8,6 @@ use App\Form\UserType;
 use App\Entity\Operation;
 use App\Entity\Partenaire;
 use App\Form\PartenaireType;
-use PhpParser\Node\Stmt\Catch_;
-use App\Repository\UserRepository;
 use App\Repository\OperationRepository;
 use App\Repository\PartenaireRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -79,11 +77,11 @@ class PartenaireController extends AbstractController
     }
     /**
      *  @Route("/history", name="histor", methods={"GET"})
-     *  @IsGranted("ROLE_CAISSIER")
      */
-    public function historique(OperationRepository $operationRepository, SerializerInterface $serializer)
-    {
-        $operation = $operationRepository->findAll();
+    public function historique(EntityManagerInterface $entityManager, SerializerInterface $serializer)
+    {            $user = $this->getUser();
+
+        $operation = $entityManager->getRepository(Operation::class)->findOneBy(["caissier"=> $user]);
 
         $data      = $serializer->serialize($operation, 'json', ['groups' => ['liste']]);
         return new Response($data, 200, []);
@@ -297,15 +295,7 @@ class PartenaireController extends AbstractController
     
             $repo = $this->getDoctrine()->getRepository(Partenaire::class);
             $partenaire = $repo->findOneBy(['ninea' => $values->ninea]);
-         
-            if (!$partenaire) {
-                $data = [
-                    'status' => 500,
-                    'message' => 'le code n\'est pas valide'
-                ];
-                return new JsonResponse($data, 500);
-            }
-            $data  = $serializer->serialize($partenaire, 'json', ['groups' => ['lister']]);
+            $data  = $serializer->serialize($partenaire, 'json', ['groups' => ['listeP']]);
             return new Response($data, 200, []);
  }
 
@@ -405,5 +395,25 @@ class PartenaireController extends AbstractController
         ];
         return new JsonResponse($data);
     }
+      /**
+     * @Route("/userid/{id}", name="getu", methods={"GET"})
+     */
+    public function users(Request $request, SerializerInterface $serializer, User $user, ValidatorInterface $validator, EntityManagerInterface $entityManager)
+    {
+        $user = $entityManager->getRepository(User::class)->find($user->getId());
+        $data      = $serializer->serialize($user, 'json', ['groups' => ['users']]);
+        return new Response($data, 200, []);
+    }
+      /**
+     * @Route("/findallCompte", name="findallCompte", methods={"GET"})
+     */
+    public function findallCompte(Request $request, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $entityManager)
+    {        $user = $this->getUser();
 
+            $repo = $this->getDoctrine()->getRepository(Compte::class);
+            $compte = $repo->getUserPart($user->getPartenaire());
+            $data  = $serializer->serialize($compte, 'json', ['groups' => ['listeP']]);
+            return new Response($data, 200, []);
+  
+}
 }

@@ -24,6 +24,8 @@ class Beneficiaire
      * @ORM\Column(type="string", length=255)
      *  @Groups({"lister"})
      *  @Groups({"code"})
+     * @Groups({"trans"})
+
      */
     private $nomb;
 
@@ -31,6 +33,8 @@ class Beneficiaire
      * @ORM\Column(type="string", length=255)
      *   @Groups({"lister"})
      *  @Groups({"code"})
+     * @Groups({"trans"})
+
      */
     private $prenomb;
 
@@ -38,6 +42,8 @@ class Beneficiaire
      * @ORM\Column(type="integer")
      *    @Groups({"lister"})
      *  @Groups({"code"})
+     * @Groups({"trans"})
+
      */
     private $telephoneb;
 
@@ -56,7 +62,7 @@ class Beneficiaire
         return $this->id;
     }
 
-    
+
     /**
      * @return Collection|Transaction[]
      */
@@ -90,7 +96,7 @@ class Beneficiaire
 
     /**
      * Get the value of nomb
-     */ 
+     */
     public function getNomb()
     {
         return $this->nomb;
@@ -100,7 +106,7 @@ class Beneficiaire
      * Set the value of nomb
      *
      * @return  self
-     */ 
+     */
     public function setNomb($nomb)
     {
         $this->nomb = $nomb;
@@ -110,7 +116,7 @@ class Beneficiaire
 
     /**
      * Get the value of prenomb
-     */ 
+     */
     public function getPrenomb()
     {
         return $this->prenomb;
@@ -120,7 +126,7 @@ class Beneficiaire
      * Set the value of prenomb
      *
      * @return  self
-     */ 
+     */
     public function setPrenomb($prenomb)
     {
         $this->prenomb = $prenomb;
@@ -130,7 +136,7 @@ class Beneficiaire
 
     /**
      * Get the value of telephoneb
-     */ 
+     */
     public function getTelephoneb()
     {
         return $this->telephoneb;
@@ -140,7 +146,7 @@ class Beneficiaire
      * Set the value of telephoneb
      *
      * @return  self
-     */ 
+     */
     public function setTelephoneb($telephoneb)
     {
         $this->telephoneb = $telephoneb;
