@@ -40,7 +40,7 @@ class Partenaire
 
     /**
      * @ORM\Column(type="string")
-     *  @Assert\NotBlank(
+     *  @Assert\NotBlank()
      * message =" la raison social ne doit pas etre vide")
      *  @Assert\Length(
      *      min = 2,
@@ -102,7 +102,7 @@ class Partenaire
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="partenaire")
       *@Groups({"contrat"})
-      *  @Groups({"lister"})
+      * @Groups({"lister"})
      */
     private $users;
 

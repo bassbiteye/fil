@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "06bb82233a7e16f62223a7b0dba0ca1d",
+    "content-hash": "849ab1fab9f5e5445c464d9f8e9210c8",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -1419,6 +1419,58 @@
                 "rest"
             ],
             "time": "2019-01-03T13:05:12+00:00"
+        },
+        {
+            "name": "ismaeltoe/osms",
+            "version": "v2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ismaeltoe/osms-php.git",
+                "reference": "1d7623be0ca30d204fa841dc55b431e72ff9c59f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ismaeltoe/osms-php/zipball/1d7623be0ca30d204fa841dc55b431e72ff9c59f",
+                "reference": "1d7623be0ca30d204fa841dc55b431e72ff9c59f",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Osms\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ismael Toé",
+                    "email": "ismael.toe@gmail.com"
+                }
+            ],
+            "description": "PHP library wrapper of the Orange SMS API.",
+            "homepage": "https://github.com/ismaeltoe/osms-php",
+            "keywords": [
+                "api",
+                "client",
+                "curl",
+                "http client",
+                "json",
+                "orange",
+                "php",
+                "requests",
+                "rest",
+                "restful",
+                "sms",
+                "web service"
+            ],
+            "time": "2015-09-21T22:56:19+00:00"
         },
         {
             "name": "jdorn/sql-formatter",

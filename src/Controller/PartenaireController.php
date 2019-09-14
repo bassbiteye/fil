@@ -216,28 +216,28 @@ class PartenaireController extends AbstractController
             $compte = $repo->findOneBy(['numCompte' => $values->numCompte]);
             if (!$compte) {
                 $exception = [
-                    'status' => 500,
+                    'status' => 200,
                     'message' => 'le compte n\'existe pas'
                 ];
-                return new JsonResponse($exception, 500);
+                return new JsonResponse($exception, 200);
             }
             $solde = $compte->getSolde();
             if ($values->solde < 75000) {
                 $exception = [
-                    'status' => 500,
+                    'status' => 200,
                     'message' => 'le montant doit etre supérieur a 75000 f'
                 ];
-                return new JsonResponse($exception, 500);
+                return new JsonResponse($exception, 200);
             }
             $compte->setSolde($values->solde + $solde);
             $entityManager->persist($compte);
             $entityManager->flush();
         } catch (ParseException $exception) {
             $exception = [
-                'status' => 500,
+                'status' => 200,
                 'message' => 'Vous devez renseigner les tous  champs'
             ];
-            return new JsonResponse($exception, 500);
+            return new JsonResponse($exception, 200);
         }
 
 
@@ -268,7 +268,7 @@ class PartenaireController extends AbstractController
             $entityManager->flush();
             $data = [
                 'status' => 200,
-                'messages' => 'Le depot a éte fait avec succes ' . 'par ' . $user->getNom() . ' ' . $user->getPrenom()
+                'message' => 'Le depot a éte fait avec succes ' . 'par ' . $user->getNom() . ' ' . $user->getPrenom()
             ];
             return new JsonResponse($data);
         }
@@ -303,10 +303,10 @@ class PartenaireController extends AbstractController
           
 
     /**
-     * @Route("/addCompte", name="compte", methods={"POST"})
+     * @Route("/addCompte", name="ajoutcompte", methods={"POST"})
      * isGranted("ROLE_SUPER")
      */
-    public function addCompte(Request $request, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $entityManager)
+    public function ajouCompte(Request $request, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $entityManager)
     {
         $values = json_decode($request->getContent());
         $user = $this->getUser();
@@ -362,7 +362,7 @@ class PartenaireController extends AbstractController
         $data = [
             'num' => $compte->getNumCompte(),
             'status' => 200,
-            'message' => 'Le nouveau compte a bien été ajouté ',
+            'message' => 'Le nouveau compte est '.$random,
             
         ];
         return new JsonResponse($data, 201);

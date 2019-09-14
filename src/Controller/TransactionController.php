@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Controller;
+
+use Osms\Osms;
 use App\Entity\User;
 use App\Entity\Tarifs;
 use App\Entity\ComEtat;
@@ -26,6 +28,7 @@ use Symfony\Component\DependencyInjection\Dumper\Dumper;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+//require '/src/App\osms\Osms.php';
 
 /**
  * @Route("/api")
@@ -36,14 +39,43 @@ class TransactionController extends AbstractController
     private $dateTo;
     public function __construct()
     {
-        $this->dateFrom='dateFrom';
-        $this->dateTo='dateTo';
+        $this->dateFrom = 'dateFrom';
+        $this->dateTo = 'dateTo';
     }
     /**
      *@Route("/envoi", name="envoi")
      */
     public function envoi(Request $request, EntityManagerInterface $entityentityManager, ValidatorInterface $validator, SerializerInterface $serializer)
     {
+
+        //sms
+        $config = array(
+
+            'clientId' => 'MaIKuvEdVDAB7MbnKXHTJZl4XoviuyhF',
+            'clientSecret' => 's1qgKF0IlKKxlLA2'
+        );
+       
+$osms = new Osms($config);
+
+// retrieve an access token
+$response = $osms->getTokenFromConsumerKey();
+
+if (!empty($response['access_token'])) {
+    $senderAddress = 'tel:+221771523139';
+    $receiverAddress = 'tel:+221775205028';
+    $message = 'bienvenue sur fatfat tranfert!';
+    $senderName = 'Optimus Prime';
+
+    $osms->sendSMS($senderAddress, $receiverAddress, $message, $senderName);
+} else {
+    // error
+    echo $response['error'];
+}
+      
+
+
+
+        //sm
         $expediteur = new Expediteur();
         $formEx = $this->createform(ExpediteurType::class, $expediteur);
         $values = $request->request->all();
@@ -127,9 +159,27 @@ class TransactionController extends AbstractController
         $entityentityManager->persist($comPro);
         $entityentityManager->persist($transaction);
         $entityentityManager->flush();
+// retrieve an access token
+$response = $osms->getTokenFromConsumerKey();
+
+if (!empty($response['access_token'])) {
+    $senderAddress = 'tel:+221'+$expediteur->getTelephoneE();
+    $receiverAddress = 'tel:+221'+$beneficiare->getTelephoneb();
+    $message = 'bienvenue sur fatfat tranfert '
+    .$expediteur->getNomE(). ' '.$expediteur->getPrenomE().' vous as enoyé'
+    .$transaction->getMontantTransaction().',le code retrait est '.$transaction->getCodeSecret().
+     ' disponible dans toutes les agences fatfat';
+    $senderName = 'Optimus Prime';
+
+    $osms->sendSMS($senderAddress, $receiverAddress, $message, $senderName);
+} else {
+    // error
+    echo $response['error'];
+}
+  
         $data = [
             'statuss1' => 201,
-            'message1' => 'Le transaction a ete fait avec succes ,le code est'.$random 
+            'message' => 'Le transaction a ete fait avec succes ,le code est' . $random
         ];
         return new JsonResponse($data, 201);
     }
@@ -139,18 +189,18 @@ class TransactionController extends AbstractController
     public function verif(Request $request, SerializerInterface $serializer)
     {
         $values = json_decode($request->getContent());
-            $repo = $this->getDoctrine()->getRepository(Transaction::class);
-            $code = $repo->findOneBy(['codeSecret' =>$values->codeSecret]);
-            if (!$code) {
-                $data = [
-                    'status' => 500,
-                    'message' => 'le code n\'est pas valide'
-                ];
-                return new JsonResponse($data, 500);
-            }
-            $data  = $serializer->serialize($code, 'json', ['groups' => ['code']]);
-            return new Response($data, 200, []);
-}
+        $repo = $this->getDoctrine()->getRepository(Transaction::class);
+        $code = $repo->findOneBy(['codeSecret' => $values->codeSecret]);
+        if (!$code) {
+            $data = [
+                'status' => 500,
+                'message' => 'le code n\'est pas valide'
+            ];
+            return new JsonResponse($data, 500);
+        }
+        $data  = $serializer->serialize($code, 'json', ['groups' => ['code']]);
+        return new Response($data, 200, []);
+    }
     /**
      * @Route("/retrait", name="retrait")
      */
@@ -191,7 +241,7 @@ class TransactionController extends AbstractController
             $solde = $user->getCompte()->getSolde();
             $compte = $user->getCompte();
 
-        
+
             $com =  $transaction->getTarifs()->getFrais();
             $com = $com * 20 / 100;
 
@@ -215,17 +265,17 @@ class TransactionController extends AbstractController
         $entityentityManager->flush();
         $data = [
             'statuss' => 201,
-            'transations' =>$transaction,
-            'messge' => 'Le retrait a ete fait avec succes ' 
+            'transations' => $transaction,
+            'messge' => 'Le retrait a ete fait avec succes '
         ];
         return new JsonResponse($data, 201);
     }
-    
+
     public function transDate(TransactionRepository $repo, $debut, $fin)
     {
 
         $transactions = $repo->findDate($debut, $fin);
-       
+
         if ($debut > $fin) {
             return $this->json([
                 'message' => 'la date de début  ne doit etre superieure à la date de fin !'
@@ -238,7 +288,7 @@ class TransactionController extends AbstractController
 
         return $transactions;
     }
-   
+
     /**
      *  @Route("/partenaire", name="partenaires", methods={"GET"})
      */
@@ -252,10 +302,10 @@ class TransactionController extends AbstractController
         $data      = $serializer->serialize($partenaire, 'json', ['groups' => ['lister']]);
         return new Response($data, 200, []);
     }
-     /**
+    /**
      *  @Route("/use", name="user", methods={"GET"})
      */
-    public function user( SerializerInterface $serializer)
+    public function user(SerializerInterface $serializer)
     {
         $user = $this->getUser();
 
@@ -265,18 +315,18 @@ class TransactionController extends AbstractController
         $data      = $serializer->serialize($user, 'json', ['groups' => ['users']]);
         return new Response($data, 200, []);
     }
-     /**
+    /**
      * @Route("/verif", name="verif", methods={"POST"})
      */
     public function verifcode(Request $request, SerializerInterface $serializer)
     {
         $values = json_decode($request->getContent());
-            $repo = $this->getDoctrine()->getRepository(Transaction::class);
-            $compte = $repo->findOneBy(['codeSecret' => $values->codeSecret]);
-            $data  = $serializer->serialize($compte, 'json', ['groups' => ['compte']]);
-            return new Response($data, 200, []);
-}
- /**
+        $repo = $this->getDoctrine()->getRepository(Transaction::class);
+        $compte = $repo->findOneBy(['codeSecret' => $values->codeSecret]);
+        $data  = $serializer->serialize($compte, 'json', ['groups' => ['compte']]);
+        return new Response($data, 200, []);
+    }
+    /**
      * @Route("/detailEnvoi", name="detailEnv",methods={"POST"})
      */
     public function detailEnvi(Request $request, EntityManagerInterface $entityentityManager, ValidatorInterface $validator, SerializerInterface $serializer)
@@ -284,16 +334,16 @@ class TransactionController extends AbstractController
 
         $user = $this->getUser();
         $values = json_decode($request->getContent());
-        if(!$values){
-            $values=$request->request->all();
+        if (!$values) {
+            $values = $request->request->all();
         }
-        $debut= new \DateTime($values[$this->dateFrom]);
-        $fin= new \DateTime($values[$this->dateTo]);
+        $debut = new \DateTime($values[$this->dateFrom]);
+        $fin = new \DateTime($values[$this->dateTo]);
 
 
         try {
             $repo1 = $this->getDoctrine()->getRepository(Transaction::class);
-            $detail =$repo1->getByDate($debut,$fin,$user);
+            $detail = $repo1->getByDate($debut, $fin, $user);
             if ($detail == []) {
                 return $this->json([
                     'message' => 'aucune transaction pour cette intervale!'
@@ -311,7 +361,7 @@ class TransactionController extends AbstractController
             'Content-Type' => 'application/json'
         ]);
     }
- /**
+    /**
      * @Route("/detailRetrait", name="detailRetrai",methods={"POST"})
      */
     public function detailRetra(Request $request, EntityManagerInterface $entityentityManager, ValidatorInterface $validator, SerializerInterface $serializer)
@@ -319,16 +369,16 @@ class TransactionController extends AbstractController
 
         $user = $this->getUser();
         $values = json_decode($request->getContent());
-        if(!$values){
-            $values=$request->request->all();
+        if (!$values) {
+            $values = $request->request->all();
         }
-        $debut= new \DateTime($values[$this->dateFrom]);
-        $fin= new \DateTime($values[$this->dateTo]);
+        $debut = new \DateTime($values[$this->dateFrom]);
+        $fin = new \DateTime($values[$this->dateTo]);
 
 
         try {
             $repo1 = $this->getDoctrine()->getRepository(Transaction::class);
-            $detail =$repo1->finByDateR($debut,$fin,$user);
+            $detail = $repo1->finByDateR($debut, $fin, $user);
             if ($detail == []) {
                 return $this->json([
                     'message' => 'aucune transaction pour cette intervale!'
@@ -346,7 +396,7 @@ class TransactionController extends AbstractController
             'Content-Type' => 'application/json'
         ]);
     }
- /**
+    /**
      * @Route("/detailEnvoiP", name="detailEnvP",methods={"POST"})
      */
     public function detailEnviP(Request $request, EntityManagerInterface $entityentityManager, ValidatorInterface $validator, SerializerInterface $serializer)
@@ -354,16 +404,16 @@ class TransactionController extends AbstractController
 
         $user = $this->getUser();
         $values = json_decode($request->getContent());
-        if(!$values){
-            $values=$request->request->all();
+        if (!$values) {
+            $values = $request->request->all();
         }
-        $debut= new \DateTime($values[$this->dateFrom]);
-        $fin= new \DateTime($values[$this->dateTo]);
+        $debut = new \DateTime($values[$this->dateFrom]);
+        $fin = new \DateTime($values[$this->dateTo]);
 
 
         try {
             $repo1 = $this->getDoctrine()->getRepository(Transaction::class);
-            $detail =$repo1->findEnP($debut,$fin,$user->getPartenaire());
+            $detail = $repo1->findEnP($debut, $fin, $user->getPartenaire());
             if ($detail == []) {
                 return $this->json([
                     'message' => 'aucune transaction pour cette intervale!'
@@ -381,7 +431,7 @@ class TransactionController extends AbstractController
             'Content-Type' => 'application/json'
         ]);
     }
- /**
+    /**
      * @Route("/detailRetraitP", name="detailRetraiP",methods={"POST"})
      */
     public function detailRetraP(Request $request, EntityManagerInterface $entityentityManager, ValidatorInterface $validator, SerializerInterface $serializer)
@@ -389,16 +439,16 @@ class TransactionController extends AbstractController
 
         $user = $this->getUser();
         $values = json_decode($request->getContent());
-        if(!$values){
-            $values=$request->request->all();
+        if (!$values) {
+            $values = $request->request->all();
         }
-        $debut= new \DateTime($values[$this->dateFrom]);
-        $fin= new \DateTime($values[$this->dateTo]);
+        $debut = new \DateTime($values[$this->dateFrom]);
+        $fin = new \DateTime($values[$this->dateTo]);
 
 
         try {
             $repo1 = $this->getDoctrine()->getRepository(Transaction::class);
-            $detail =$repo1->findRetP($debut,$fin,$user->getPartenaire());
+            $detail = $repo1->findRetP($debut, $fin, $user->getPartenaire());
             if ($detail == []) {
                 return $this->json([
                     'message' => 'aucune transaction pour cette intervale!'
@@ -416,7 +466,4 @@ class TransactionController extends AbstractController
             'Content-Type' => 'application/json'
         ]);
     }
- 
-   
-
 }

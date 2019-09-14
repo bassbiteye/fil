@@ -41,7 +41,7 @@ class Expediteur
      * @ORM\Column(type="integer")
      *  @Groups({"lister"})
      *  @Groups({"code"})
-          * @Groups({"trans"})
+     * @Groups({"trans"})
 
      */
     private $telephoneE;
@@ -67,9 +67,9 @@ class Expediteur
         return $this->id;
     }
 
-  
 
-    
+
+
 
     /**
      * @return Collection|Transaction[]
@@ -135,7 +135,7 @@ class Expediteur
 
     /**
      * Get the value of nomE
-     */ 
+     */
     public function getNomE()
     {
         return $this->nomE;
@@ -145,7 +145,7 @@ class Expediteur
      * Set the value of nomE
      *
      * @return  self
-     */ 
+     */
     public function setNomE($nomE)
     {
         $this->nomE = $nomE;
@@ -155,7 +155,7 @@ class Expediteur
 
     /**
      * Get the value of prenomE
-     */ 
+     */
     public function getPrenomE()
     {
         return $this->prenomE;
@@ -165,7 +165,7 @@ class Expediteur
      * Set the value of prenomE
      *
      * @return  self
-     */ 
+     */
     public function setPrenomE($prenomE)
     {
         $this->prenomE = $prenomE;
@@ -175,7 +175,7 @@ class Expediteur
 
     /**
      * Get the value of telephoneE
-     */ 
+     */
     public function getTelephoneE()
     {
         return $this->telephoneE;
@@ -185,7 +185,7 @@ class Expediteur
      * Set the value of telephoneE
      *
      * @return  self
-     */ 
+     */
     public function setTelephoneE($telephoneE)
     {
         $this->telephoneE = $telephoneE;

@@ -111,6 +111,9 @@
             "config/packages/fos_rest.yaml"
         ]
     },
+    "ismaeltoe/osms": {
+        "version": "v2.0.1"
+    },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
     },

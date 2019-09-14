@@ -102,9 +102,8 @@ class SecurityController extends AbstractController
     public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, EntityManagerInterface $entityManager, ValidatorInterface $validator, SerializerInterface $serializer)
     {
         $user = $this->getUser();
-        $repo = $this->getDoctrine()->getRepository(Partenaire::class);
-        $id = $repo->find($user);
-        $part = $id;
+      
+     
         $userr = new User();
         $form = $this->createForm(UserType::class, $userr);
         $profile = new Profile();
@@ -128,7 +127,16 @@ class SecurityController extends AbstractController
         if($profile->getLibelle()=='caissier'){
             $userr->setRoles(["ROLE_CAISSIER"]);
         }
-        $userr->setPartenaire($part);
+      
+        if($user->getPartenaire()){
+            $repo = $this->getDoctrine()->getRepository(Partenaire::class);
+            $part=$repo->find($user->getPartenaire());
+            $userr->setPartenaire($part);
+        }else{
+            $userr->setPartenaire(NULL);
+
+        }
+        
         $errors = $validator->validate($userr);
 
         if (count($errors)) {
