@@ -81,7 +81,7 @@ class PartenaireController extends AbstractController
     public function historique(EntityManagerInterface $entityManager, SerializerInterface $serializer)
     {            $user = $this->getUser();
 
-        $operation = $entityManager->getRepository(Operation::class)->findOneBy(["caissier"=> $user]);
+        $operation = $entityManager->getRepository(Operation::class)->findBy(["caissier"=> $user]);
 
         $data      = $serializer->serialize($operation, 'json', ['groups' => ['liste']]);
         return new Response($data, 200, []);

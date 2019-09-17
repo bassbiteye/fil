@@ -28,7 +28,6 @@ use Symfony\Component\DependencyInjection\Dumper\Dumper;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-//require '/src/App\osms\Osms.php';
 
 /**
  * @Route("/api")
@@ -47,35 +46,6 @@ class TransactionController extends AbstractController
      */
     public function envoi(Request $request, EntityManagerInterface $entityentityManager, ValidatorInterface $validator, SerializerInterface $serializer)
     {
-
-        //sms
-        $config = array(
-
-            'clientId' => 'MaIKuvEdVDAB7MbnKXHTJZl4XoviuyhF',
-            'clientSecret' => 's1qgKF0IlKKxlLA2'
-        );
-       
-$osms = new Osms($config);
-
-// retrieve an access token
-$response = $osms->getTokenFromConsumerKey();
-
-if (!empty($response['access_token'])) {
-    $senderAddress = 'tel:+221771523139';
-    $receiverAddress = 'tel:+221775205028';
-    $message = 'bienvenue sur fatfat tranfert!';
-    $senderName = 'Optimus Prime';
-
-    $osms->sendSMS($senderAddress, $receiverAddress, $message, $senderName);
-} else {
-    // error
-    echo $response['error'];
-}
-      
-
-
-
-        //sm
         $expediteur = new Expediteur();
         $formEx = $this->createform(ExpediteurType::class, $expediteur);
         $values = $request->request->all();
@@ -135,10 +105,10 @@ if (!empty($response['access_token'])) {
         }
         if ($transaction->getMontantTransaction() > $solde) {
             $data = [
-                'statuss' => 500,
-                'messge' => 'Le montant est insuffisant '
+                'status' => 201,
+                'message' => 'Le montant est insuffisant '
             ];
-            return new JsonResponse($data, 500);
+            return new JsonResponse($data, 201);
         }
         $errors = $validator->validate($transaction);
         if (count($errors)) {
@@ -159,17 +129,25 @@ if (!empty($response['access_token'])) {
         $entityentityManager->persist($comPro);
         $entityentityManager->persist($transaction);
         $entityentityManager->flush();
+            //sms
+            $config = array(
+
+                'clientId' => 'MaIKuvEdVDAB7MbnKXHTJZl4XoviuyhF',
+                'clientSecret' => 's1qgKF0IlKKxlLA2'
+            );
+           
+    $osms = new Osms($config);
 // retrieve an access token
 $response = $osms->getTokenFromConsumerKey();
 
 if (!empty($response['access_token'])) {
-    $senderAddress = 'tel:+221'+$expediteur->getTelephoneE();
-    $receiverAddress = 'tel:+221'+$beneficiare->getTelephoneb();
+    $senderAddress = 'tel:+221'.$expediteur->getTelephoneE();
+    $receiverAddress = 'tel:+221'.$beneficiare->getTelephoneb();
     $message = 'bienvenue sur fatfat tranfert '
-    .$expediteur->getNomE(). ' '.$expediteur->getPrenomE().' vous as enoyé'
-    .$transaction->getMontantTransaction().',le code retrait est '.$transaction->getCodeSecret().
+    .$expediteur->getNomE(). ' '.$expediteur->getPrenomE().' vous as enoyé '
+    .$transaction->getMontantTransaction(). ',le code retrait est '.$transaction->getCodeSecret().
      ' disponible dans toutes les agences fatfat';
-    $senderName = 'Optimus Prime';
+    $senderName = $expediteur->getNomE();
 
     $osms->sendSMS($senderAddress, $receiverAddress, $message, $senderName);
 } else {
@@ -178,10 +156,32 @@ if (!empty($response['access_token'])) {
 }
   
         $data = [
-            'statuss1' => 201,
-            'message' => 'Le transaction a ete fait avec succes ,le code est' . $random
+            'status' => 201,
+            'message' => 'Le transaction a ete fait avec succes ,le code est  ' . $random
         ];
         return new JsonResponse($data, 201);
+    }
+    /**
+     * @Route("/frais",name="fr",methods={"POST"})
+     */
+    public function tarif(Request $request, SerializerInterface $serializer){
+       
+        $transaction = new Transaction();
+        $formT = $this->createform(TransactionType::class, $transaction);
+        $values = $request->request->all();
+        $formT->submit($values);
+        $repo = $this->getDoctrine()->getRepository(Tarifs::class);
+        $tarif = $repo->findAll();
+        for ($i = 0; $i < count($tarif); $i++) {
+            if (
+                $transaction->getMontantTransaction() >= $tarif[$i]->getMin()
+                && $transaction->getMontantTransaction() <= $tarif[$i]->getMax()
+            ) {
+                $data  = $serializer->serialize($tarif[$i], 'json', ['groups' => ['frais']]);
+        return new Response($data, 200, []);
+
+            }
+        }
     }
     /**
      * @Route("/verif", name="verifier", methods={"POST"})
@@ -246,7 +246,13 @@ if (!empty($response['access_token'])) {
             $com = $com * 20 / 100;
 
             $compte->setSolde($solde + $transaction->getMontantTransaction() + $com);
-
+            // if ($transaction->getMontantTransaction() > $solde) {
+            //     $data = [
+            //         'status' => 201,
+            //         'message' => 'Le montant est insuffisant '
+            //     ];
+            //     return new JsonResponse($data, 201);
+            // }
             $errors = $validator->validate($transaction);
             if (count($errors)) {
                 $errors = $serializer->serialize($errors, 'json');

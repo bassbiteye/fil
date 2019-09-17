@@ -36,7 +36,7 @@ class Tarifs
      * @ORM\Column(type="integer")
      *@Groups({"lister"})
     * @Groups({"trans"})
-
+* @Groups({"frais"})
      */
     private $frais;
 

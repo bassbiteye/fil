@@ -76,9 +76,9 @@ class Osms
      * Sends SMS.
      *
      * @param  string  $senderAddress    The receiver address in this format:
-     *                                   "tel:+22500000000"
+     *                                   "tel:+22100000000"
      * @param  string  $receiverAddress  The receiver address in this format:
-     *                                   "tel:+22500000000"
+     *                                   "tel:+22100000000"
      * @param  string  $message          The content of the SMS, must not exceed
      *                                   160 characters         
      * @param  string  $senderName       The sender name

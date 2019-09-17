@@ -98,4 +98,15 @@ class TransactionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function getCount($user)
+    {
+        return $this->createQueryBuilder('t')
+			->select('COUNT (t.id)')
+            ->where('t.user = :val')
+            ->andwhere('t.userRetrait = :val')
+            ->setParameter('val', $user)
+          ->getQuery()
+          ->getResult();
+	}
 }

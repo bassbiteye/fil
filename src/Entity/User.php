@@ -15,12 +15,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @Vich\Uploadable
- *  @UniqueEntity("username" ,message =" Ce username  existe déja") 
- * @UniqueEntity(
- *     fields={"telephone","username"},
- *     errorPath="telephone",
- *     message="Ce telephone  existe déja"
- * )
  */
 class User implements UserInterface
 {
@@ -51,7 +45,6 @@ class User implements UserInterface
      *@Assert\NotBlank(message =" le role ne doit pas etre vide")
      * @Groups({"lister"})
      *@Groups({"contrat","users"})
-
      */
     private $roles = [];
 

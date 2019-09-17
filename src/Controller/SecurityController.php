@@ -9,6 +9,7 @@ use App\Entity\Profile;
 use App\Form\ProfileType;
 
 use App\Entity\Partenaire;
+use App\Entity\Transaction;
 use App\Repository\CompteRepository;
 use App\Repository\ProfileRepository;
 use App\Repository\UserRepository;
@@ -59,6 +60,16 @@ class SecurityController extends AbstractController
     {       
         $user1 = $this->getUser();
         $user = $entityManager->getRepository(User::class)->getInfo($user1->getCompte(),$user1->getId());
+        $data      = $serializer->serialize($user, 'json', ['groups' => ['users']]);
+        return new Response($data, 200, []);
+    }
+    /**
+     *@Route("/countt", name="cnt", methods={"GET"})
+     */
+    public function countT(EntityManagerInterface $entityManager, SerializerInterface $serializer)
+    {       
+        $user1 = $this->getUser();
+        $user = $entityManager->getRepository(Transaction::class)->getCount($user1->getId());
         $data      = $serializer->serialize($user, 'json', ['groups' => ['users']]);
         return new Response($data, 200, []);
     }
