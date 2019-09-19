@@ -1,0 +1,96 @@
+<?php
+
+namespace Symfony\Component\VarExporter\Internal;
+
+return $getExpiry ? PHP_INT_MAX : Hydrator::hydrate(
+    $o = [
+        clone (($p = &Registry::$prototypes)['Doctrine\\ORM\\Mapping\\Column'] ?? Registry::p('Doctrine\\ORM\\Mapping\\Column')),
+        clone ($p['Symfony\\Component\\Validator\\Constraints\\NotBlank'] ?? Registry::p('Symfony\\Component\\Validator\\Constraints\\NotBlank')),
+        clone ($p['Symfony\\Component\\Validator\\Constraints\\Length'] ?? Registry::p('Symfony\\Component\\Validator\\Constraints\\Length')),
+        clone $p['Symfony\\Component\\Validator\\Constraints\\NotBlank'],
+        clone ($p['Symfony\\Component\\Validator\\Constraints\\Regex'] ?? Registry::p('Symfony\\Component\\Validator\\Constraints\\Regex')),
+        clone ($p['Symfony\\Component\\Validator\\Constraints\\Positive'] ?? Registry::p('Symfony\\Component\\Validator\\Constraints\\Positive')),
+        clone ($p['Symfony\\Component\\Serializer\\Annotation\\Groups'] ?? Registry::p('Symfony\\Component\\Serializer\\Annotation\\Groups')),
+        clone $p['Symfony\\Component\\Validator\\Constraints\\NotBlank'],
+        clone $p['Symfony\\Component\\Serializer\\Annotation\\Groups'],
+        clone $p['Symfony\\Component\\Serializer\\Annotation\\Groups'],
+    ],
+    null,
+    [
+        'stdClass' => [
+            'type' => [
+                'integer',
+            ],
+            'message' => [
+                1 => ' le numero ne doit pas etre vide',
+                3 => 'Vous devez insérer un téléphone',
+                'Votre numero ne doit pas contenir de lettre',
+                'cette valeur doit être positive',
+            ],
+            'groups' => [
+                1 => [
+                    'Default',
+                ],
+                [
+                    'Default',
+                ],
+                [
+                    'Default',
+                ],
+                [
+                    'Default',
+                ],
+                [
+                    'Default',
+                ],
+                7 => [
+                    'Default',
+                ],
+            ],
+            'maxMessage' => [
+                2 => 'le numero doit etre au max {{ limit }} chiffres',
+            ],
+            'minMessage' => [
+                2 => 'le numero doit etre au moins {{ limit }} chiffres',
+            ],
+            'max' => [
+                2 => 14,
+            ],
+            'min' => [
+                2 => 9,
+            ],
+            'pattern' => [
+                4 => '/^(\\+[1-9][0-9]*(\\([0-9]*\\)|-[0-9]*-))?[0]?[1-9][0-9\\-]*$/',
+            ],
+            'value' => [
+                5 => 0,
+            ],
+        ],
+        'Symfony\\Component\\Serializer\\Annotation\\Groups' => [
+            'groups' => [
+                6 => [
+                    'lister',
+                ],
+                8 => [
+                    'users',
+                ],
+                [
+                    'liste',
+                ],
+            ],
+        ],
+    ],
+    [
+        $o[0],
+        $o[1],
+        $o[2],
+        $o[3],
+        $o[4],
+        $o[5],
+        $o[6],
+        $o[7],
+        $o[8],
+        $o[9],
+    ],
+    []
+);

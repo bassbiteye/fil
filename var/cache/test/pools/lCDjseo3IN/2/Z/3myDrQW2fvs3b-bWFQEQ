@@ -1,0 +1,49 @@
+<?php
+
+namespace Symfony\Component\VarExporter\Internal;
+
+return $getExpiry ? PHP_INT_MAX : Hydrator::hydrate(
+    $o = [
+        clone (($p = &Registry::$prototypes)['Doctrine\\ORM\\Mapping\\Entity'] ?? Registry::p('Doctrine\\ORM\\Mapping\\Entity')),
+        clone ($p['Vich\\UploaderBundle\\Mapping\\Annotation\\Uploadable'] ?? Registry::p('Vich\\UploaderBundle\\Mapping\\Annotation\\Uploadable')),
+        clone ($p['Symfony\\Bridge\\Doctrine\\Validator\\Constraints\\UniqueEntity'] ?? Registry::p('Symfony\\Bridge\\Doctrine\\Validator\\Constraints\\UniqueEntity')),
+        clone $p['Symfony\\Bridge\\Doctrine\\Validator\\Constraints\\UniqueEntity'],
+    ],
+    null,
+    [
+        'stdClass' => [
+            'repositoryClass' => [
+                'App\\Repository\\UserRepository',
+            ],
+            'message' => [
+                2 => ' Ce username  existe déja',
+                'Ce telephone  existe déja',
+            ],
+            'fields' => [
+                2 => 'username',
+                [
+                    'telephone',
+                    'username',
+                ],
+            ],
+            'groups' => [
+                2 => [
+                    'Default',
+                ],
+                [
+                    'Default',
+                ],
+            ],
+            'errorPath' => [
+                3 => 'telephone',
+            ],
+        ],
+    ],
+    [
+        $o[0],
+        $o[1],
+        $o[2],
+        $o[3],
+    ],
+    []
+);

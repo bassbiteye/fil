@@ -1,0 +1,51 @@
+<?php
+
+namespace Symfony\Component\VarExporter\Internal;
+
+return $getExpiry ? PHP_INT_MAX : Hydrator::hydrate(
+    $o = [
+        clone (($p = &Registry::$prototypes)['Symfony\\Component\\Validator\\Constraints\\File'] ?? Registry::p('Symfony\\Component\\Validator\\Constraints\\File')),
+        clone ($p['Vich\\UploaderBundle\\Mapping\\Annotation\\UploadableField'] ?? Registry::p('Vich\\UploaderBundle\\Mapping\\Annotation\\UploadableField')),
+    ],
+    null,
+    [
+        'stdClass' => [
+            'binaryFormat' => [
+                false,
+            ],
+            'mimeTypes' => [
+                [
+                    'image/jpeg',
+                    'image/pjpeg',
+                    'image/png',
+                ],
+            ],
+            'mimeTypesMessage' => [
+                'Veuillez saisir un bon format d\\\'image',
+            ],
+            'groups' => [
+                [
+                    'Default',
+                ],
+            ],
+        ],
+        'Symfony\\Component\\Validator\\Constraints\\File' => [
+            'maxSize' => [
+                5000000,
+            ],
+        ],
+        'Vich\\UploaderBundle\\Mapping\\Annotation\\UploadableField' => [
+            'mapping' => [
+                1 => 'User',
+            ],
+            'fileNameProperty' => [
+                1 => 'imageName',
+            ],
+        ],
+    ],
+    [
+        $o[0],
+        $o[1],
+    ],
+    []
+);
