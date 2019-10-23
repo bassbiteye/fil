@@ -126,16 +126,16 @@ class SecurityController extends AbstractController
         $userr->setEtat("actif");
         $file = $request->files->all()['imageName'];
         $userr->setImageFile($file);
-        if($profile->getLibelle()=='admin'){
+        if($profile->getName()=='ADMIN'){
             $userr->setRoles(["ROLE_ADMIN"]);
         }
-        if($profile->getLibelle()=='super'){
+        if($profile->getName()=='SUPER'){
             $userr->setRoles(["ROLE_SUPER"]);
         }
-        if($profile->getLibelle()=='user'){
-            $userr->setRoles(["ROLE_USERS"]);
+        if($profile->getName()=='USER'){
+            $userr->setRoles(["USERS"]);
         }
-        if($profile->getLibelle()=='caissier'){
+        if($profile->getName()=='CAISSIER'){
             $userr->setRoles(["ROLE_CAISSIER"]);
         }
       

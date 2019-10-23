@@ -69,8 +69,7 @@ class TransactionController extends AbstractController
             ]);
         }
         $transaction = new Transaction();
-        $comETAT = new ComEtat();
-        $comPro = new ComProprietaire();
+     
         $user = $this->getUser();
 
         $repo = $this->getDoctrine()->getRepository(Tarifs::class);
@@ -90,26 +89,32 @@ class TransactionController extends AbstractController
         $transaction->setUser($user);
         $solde = $user->getCompte()->getSolde();
         $compte = $user->getCompte();
-        for ($i = 0; $i < count($tarif); $i++) {
-            if (
-                $transaction->getMontantTransaction() >= $tarif[$i]->getMin()
-                && $transaction->getMontantTransaction() <= $tarif[$i]->getMax()
-            ) {
-                $transaction->setMontantTransaction($transaction->getMontantTransaction());
-                $transaction->setTarifs($tarif[$i]);
-                $comEnvoi = $tarif[$i]->getFrais() * 10 / 100;
-                $comE = $tarif[$i]->getFrais() * 30 / 100;
-                $comPr = $tarif[$i]->getFrais() * 40 / 100;
-                $compte->setSolde($solde - $transaction->getMontantTransaction() +  $comEnvoi);
-            }
-        }
-        if ($transaction->getMontantTransaction() > $solde) {
+        $montant = $transaction->getMontantTransaction();
+        if ($montant > $solde) {
             $data = [
                 'status' => 201,
                 'message' => 'Le montant est insuffisant '
             ];
             return new JsonResponse($data, 201);
         }
+        for ($i = 0; $i < count($tarif); $i++) {
+            if ($montant >= $tarif[$i]->getMin()&& $montant <= $tarif[$i]->getMax()) {
+                $transaction->setTarifs($tarif[$i]);
+                $comEnvoi = $tarif[$i]->getFrais();
+                $comE = $tarif[$i]->getFrais();
+                $comPr = $tarif[$i]->getFrais();
+            }
+        }
+        $comEnvoi = $comEnvoi * 20 / 100;
+        $comE =  $comE * 30 / 100;
+        $comPr = $comPr * 30 / 100;
+        $transaction->setMontantTransaction($montant);
+        if($request->request->get('ok')){
+            $compte->setSolde($solde - ($montant +  $comEnvoi));
+        }else{
+            $compte->setSolde($solde - $montant);
+        }
+
         $errors = $validator->validate($transaction);
         if (count($errors)) {
             $errors = $serializer->serialize($errors, 'json');
@@ -117,44 +122,39 @@ class TransactionController extends AbstractController
                 'Content-Type' => 'application/json'
             ]);
         }
-        $comETAT->setCommission($comE);
-        $comETAT->setDateCom(new \DateTime('now'));
-        $comETAT->setTransaction($transaction);
-        $comPro->setCommission($comPr);
-        $comPro->setDateCom(new \DateTime('now'));
-        $comPro->setTransaction($transaction);
+        $transaction->setComEtat($comE);
+        $transaction->setComProprietaire($comPr);
+        $transaction->setComEnvoie($comEnvoi);
         $entityentityManager->persist($beneficiare);
         $entityentityManager->persist($expediteur);
-        $entityentityManager->persist($comETAT);
-        $entityentityManager->persist($comPro);
         $entityentityManager->persist($transaction);
         $entityentityManager->flush();
-            //sms
-            $config = array(
+        //sms
+        $config = array(
 
-                'clientId' => 'MaIKuvEdVDAB7MbnKXHTJZl4XoviuyhF',
-                'clientSecret' => 's1qgKF0IlKKxlLA2'
-            );
-           
-    $osms = new Osms($config);
-// retrieve an access token
-$response = $osms->getTokenFromConsumerKey();
+            'clientId' => 'MaIKuvEdVDAB7MbnKXHTJZl4XoviuyhF',
+            'clientSecret' => 's1qgKF0IlKKxlLA2'
+        );
 
-if (!empty($response['access_token'])) {
-    $senderAddress = 'tel:+221'.$expediteur->getTelephoneE();
-    $receiverAddress = 'tel:+221'.$beneficiare->getTelephoneb();
-    $message = 'bienvenue sur fatfat tranfert '
-    .$expediteur->getNomE(). ' '.$expediteur->getPrenomE().' vous as enoyé '
-    .$transaction->getMontantTransaction(). ',le code retrait est '.$transaction->getCodeSecret().
-     ' disponible dans toutes les agences fatfat';
-    $senderName = $expediteur->getNomE();
+        $osms = new Osms($config);
+        // retrieve an access token
+        $response = $osms->getTokenFromConsumerKey();
 
-    $osms->sendSMS($senderAddress, $receiverAddress, $message, $senderName);
-} else {
-    // error
-    echo $response['error'];
-}
-  
+        if (!empty($response['access_token'])) {
+            $senderAddress = 'tel:+221' . $expediteur->getTelephoneE();
+            $receiverAddress = 'tel:+221' . $beneficiare->getTelephoneb();
+            $message = 'bienvenue sur fatfat tranfert '
+                . $expediteur->getNomE() . ' ' . $expediteur->getPrenomE() . ' vous as enoyé '
+                . $transaction->getMontantTransaction() . ',le code retrait est ' . $transaction->getCodeSecret() .
+                ' disponible dans toutes les agences fatfat';
+            $senderName = $expediteur->getNomE();
+
+            $osms->sendSMS($senderAddress, $receiverAddress, $message, $senderName);
+        } else {
+            // error
+            echo $response['error'];
+        }
+
         $data = [
             'status' => 201,
             'message' => 'Le transaction a ete fait avec succes ,le code est  ' . $random
@@ -164,8 +164,9 @@ if (!empty($response['access_token'])) {
     /**
      * @Route("/frais",name="fr",methods={"POST"})
      */
-    public function tarif(Request $request, SerializerInterface $serializer){
-       
+    public function tarif(Request $request, SerializerInterface $serializer)
+    {
+
         $transaction = new Transaction();
         $formT = $this->createform(TransactionType::class, $transaction);
         $values = $request->request->all();
@@ -178,8 +179,7 @@ if (!empty($response['access_token'])) {
                 && $transaction->getMontantTransaction() <= $tarif[$i]->getMax()
             ) {
                 $data  = $serializer->serialize($tarif[$i], 'json', ['groups' => ['frais']]);
-        return new Response($data, 200, []);
-
+                return new Response($data, 200, []);
             }
         }
     }
@@ -188,15 +188,26 @@ if (!empty($response['access_token'])) {
      */
     public function verif(Request $request, SerializerInterface $serializer)
     {
-        $values = json_decode($request->getContent());
+        $transaction = new Transaction();
+        $formTr = $this->createform(TransactionType::class, $transaction);
+        $values = $request->request->all();
+        $formTr->submit($values);
+        try {
         $repo = $this->getDoctrine()->getRepository(Transaction::class);
-        $code = $repo->findOneBy(['codeSecret' => $values->codeSecret]);
+        $code = $repo->findOneBy(['codeSecret' =>  $transaction->getCodeSecret()]);
         if (!$code) {
             $data = [
                 'status' => 500,
                 'message' => 'le code n\'est pas valide'
             ];
             return new JsonResponse($data, 500);
+        }   
+     } catch (ParseException $exception) {
+            $exception = [
+                'status' => 500,
+                'message' => 'Vous devez renseigner  tous  les champs'
+            ];
+            return new JsonResponse($exception, 500);
         }
         $data  = $serializer->serialize($code, 'json', ['groups' => ['code']]);
         return new Response($data, 200, []);

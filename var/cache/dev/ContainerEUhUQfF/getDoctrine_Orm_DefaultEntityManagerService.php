@@ -50,8 +50,6 @@ $a->setQuoteStrategy(new \Doctrine\ORM\Mapping\DefaultQuoteStrategy());
 $a->setEntityListenerResolver(new \Doctrine\Bundle\DoctrineBundle\Mapping\ContainerEntityListenerResolver($this));
 $a->setRepositoryFactory(new \Doctrine\Bundle\DoctrineBundle\Repository\ContainerRepositoryFactory(new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($this->getService, [
     'App\\Repository\\BeneficiaireRepository' => ['privates', 'App\\Repository\\BeneficiaireRepository', 'getBeneficiaireRepositoryService.php', true],
-    'App\\Repository\\ComEtatRepository' => ['privates', 'App\\Repository\\ComEtatRepository', 'getComEtatRepositoryService.php', true],
-    'App\\Repository\\ComProprietaireRepository' => ['privates', 'App\\Repository\\ComProprietaireRepository', 'getComProprietaireRepositoryService.php', true],
     'App\\Repository\\CompteRepository' => ['privates', 'App\\Repository\\CompteRepository', 'getCompteRepositoryService.php', true],
     'App\\Repository\\ExpediteurRepository' => ['privates', 'App\\Repository\\ExpediteurRepository', 'getExpediteurRepositoryService.php', true],
     'App\\Repository\\OperationRepository' => ['privates', 'App\\Repository\\OperationRepository', 'getOperationRepositoryService.php', true],
@@ -62,8 +60,6 @@ $a->setRepositoryFactory(new \Doctrine\Bundle\DoctrineBundle\Repository\Containe
     'App\\Repository\\UserRepository' => ['privates', 'App\\Repository\\UserRepository', 'getUserRepositoryService.php', true],
 ], [
     'App\\Repository\\BeneficiaireRepository' => '?',
-    'App\\Repository\\ComEtatRepository' => '?',
-    'App\\Repository\\ComProprietaireRepository' => '?',
     'App\\Repository\\CompteRepository' => '?',
     'App\\Repository\\ExpediteurRepository' => '?',
     'App\\Repository\\OperationRepository' => '?',

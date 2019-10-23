@@ -21,21 +21,21 @@ class Profile
      * * @Groups({"profile"})
      * @ORM\Column(type="string", length=15)
      */
-    private $libelle;
+    private $name;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getLibelle(): ?string
+    public function getName(): ?string
     {
-        return $this->libelle;
+        return $this->name;
     }
 
-    public function setLibelle(string $libelle): self
+    public function setName(string $name): self
     {
-        $this->libelle = $libelle;
+        $this->name = $name;
 
         return $this;
     }

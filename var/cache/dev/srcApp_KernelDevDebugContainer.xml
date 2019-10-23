@@ -381,14 +381,6 @@
       <tag name="doctrine.repository_service"/>
       <argument type="service" id="doctrine"/>
     </service>
-    <service id="App\Repository\ComEtatRepository" class="App\Repository\ComEtatRepository" autowire="true" autoconfigure="true">
-      <tag name="doctrine.repository_service"/>
-      <argument type="service" id="doctrine"/>
-    </service>
-    <service id="App\Repository\ComProprietaireRepository" class="App\Repository\ComProprietaireRepository" autowire="true" autoconfigure="true">
-      <tag name="doctrine.repository_service"/>
-      <argument type="service" id="doctrine"/>
-    </service>
     <service id="App\Repository\CompteRepository" class="App\Repository\CompteRepository" autowire="true" autoconfigure="true">
       <tag name="doctrine.repository_service"/>
       <argument type="service" id="doctrine"/>
@@ -1312,6 +1304,14 @@
         <argument>2048</argument>
       </call>
       <call method="addListener">
+        <argument>console.command</argument>
+        <argument type="collection">
+          <argument type="service" id="debug.debug_handlers_listener"/>
+          <argument>configure</argument>
+        </argument>
+        <argument>2048</argument>
+      </call>
+      <call method="addListener">
         <argument>kernel.exception</argument>
         <argument type="collection">
           <argument type="service" id="debug.debug_handlers_listener"/>
@@ -1980,7 +1980,7 @@
       <factory class="Doctrine\ORM\EntityManager" method="create"/>
     </service>
     <service id="doctrine.orm.container_repository_factory" class="Doctrine\Bundle\DoctrineBundle\Repository\ContainerRepositoryFactory" public="false">
-      <argument type="service" id=".service_locator.N3znHWq"/>
+      <argument type="service" id=".service_locator.goAU6pS"/>
     </service>
     <service id="doctrine.orm.manager_configurator.abstract" class="Doctrine\Bundle\DoctrineBundle\ManagerConfigurator" abstract="true">
       <argument type="collection"/>
@@ -3775,10 +3775,6 @@
     <service id=".abstract.instanceof.App\Form\UserType" class="App\Form\UserType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\BeneficiaireRepository" class="App\Repository\BeneficiaireRepository" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Repository\BeneficiaireRepository" class="App\Repository\BeneficiaireRepository" autowire="true" autoconfigure="true" abstract="true"/>
-    <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\ComEtatRepository" class="App\Repository\ComEtatRepository" autowire="true" abstract="true"/>
-    <service id=".abstract.instanceof.App\Repository\ComEtatRepository" class="App\Repository\ComEtatRepository" autowire="true" autoconfigure="true" abstract="true"/>
-    <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\ComProprietaireRepository" class="App\Repository\ComProprietaireRepository" autowire="true" abstract="true"/>
-    <service id=".abstract.instanceof.App\Repository\ComProprietaireRepository" class="App\Repository\ComProprietaireRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\CompteRepository" class="App\Repository\CompteRepository" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Repository\CompteRepository" class="App\Repository\CompteRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\ExpediteurRepository" class="App\Repository\ExpediteurRepository" autowire="true" abstract="true"/>
@@ -4228,12 +4224,10 @@
         <argument key="doctrine.orm.default_listeners.attach_entity_listeners" type="service" id="doctrine.orm.default_listeners.attach_entity_listeners"/>
       </argument>
     </service>
-    <service id=".service_locator.N3znHWq" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
+    <service id=".service_locator.goAU6pS" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Repository\BeneficiaireRepository" type="service" id="App\Repository\BeneficiaireRepository"/>
-        <argument key="App\Repository\ComEtatRepository" type="service" id="App\Repository\ComEtatRepository"/>
-        <argument key="App\Repository\ComProprietaireRepository" type="service" id="App\Repository\ComProprietaireRepository"/>
         <argument key="App\Repository\CompteRepository" type="service" id="App\Repository\CompteRepository"/>
         <argument key="App\Repository\ExpediteurRepository" type="service" id="App\Repository\ExpediteurRepository"/>
         <argument key="App\Repository\OperationRepository" type="service" id="App\Repository\OperationRepository"/>

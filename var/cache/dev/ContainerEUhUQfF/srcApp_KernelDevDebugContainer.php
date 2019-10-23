@@ -1,6 +1,6 @@
 <?php
 
-namespace ContainerKwUPi6j;
+namespace ContainerEUhUQfF;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -328,6 +328,9 @@ class srcApp_KernelDevDebugContainer extends Container
             return ($this->privates['session_listener'] ?? $this->getSessionListenerService());
         }, 1 => 'onFinishRequest'], 0);
         $instance->addListener('kernel.request', [0 => function () {
+            return ($this->privates['debug.debug_handlers_listener'] ?? $this->getDebug_DebugHandlersListenerService());
+        }, 1 => 'configure'], 2048);
+        $instance->addListener('console.command', [0 => function () {
             return ($this->privates['debug.debug_handlers_listener'] ?? $this->getDebug_DebugHandlersListenerService());
         }, 1 => 'configure'], 2048);
         $instance->addListener('kernel.exception', [0 => function () {

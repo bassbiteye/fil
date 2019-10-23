@@ -15,13 +15,13 @@ class Osms
      *
      * @var string
      */
-    protected $clientSecret = 's1qgKF0IlKKxlLA2';
+    protected $clientSecret = '7nqfJF6WurMdQf95';
     /**
      * The Token will be used for all further API calls.
      *
      * @var string
      */
-    protected $token = 'Basic TWFJS3V2RWRWREFCN01ibktYSFRKWmw0WG92aXV5aEY6czFxZ0tGMElsS0t4bExBMg==';
+    protected $token = 'Basic TWFJS3V2RWRWREFCN01ibktYSFRKWmw0WG92aXV5aEY6N25xZkpGNld1ck1kUWY5NQ==';
     /**
      * cURL option for whether to verify the peer's certificate or not.
      *
@@ -41,7 +41,7 @@ class Osms
     public function __construct($config = array())
     {
         if (array_key_exists('clientId', $config)) {
-            $this->clientId = /home/bass-codeur/sites/projetfil/config/services.yaml$config['clientId'];
+            //$this->clientId = /home/bass-codeur/sites/projetfil/config/services.yaml$config['clientId'];
         }
         if (array_key_exists('clientSecret', $config)) {
             $this->clientSecret = $config['clientSecret'];

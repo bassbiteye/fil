@@ -14,6 +14,9 @@ return $getExpiry ? PHP_INT_MAX : Hydrator::hydrate(
             'length' => [
                 255,
             ],
+            'nullable' => [
+                true,
+            ],
         ],
         'Symfony\\Component\\Serializer\\Annotation\\Groups' => [
             'groups' => [

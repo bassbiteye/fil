@@ -26,7 +26,7 @@ class Transaction
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups({"code"})
      * @Groups({"trans","users"})
 
@@ -114,22 +114,34 @@ class Transaction
     private $tarifs;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\ComProprietaire", mappedBy="transaction")
-     *@Groups({"trans"})
-     */
-    private $comProprietaires;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\ComEtat", mappedBy="transaction")
-     *@Groups({"trans"})
-     */
-    private $comEtats;
-
-    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="retrait")
      * @Groups({"trans"})
      */
     private $userRetrait;
+
+    /**
+     * @ORM\Column(type="bigint")
+     * @Groups({"trans"})
+     */
+    private $comEtat;
+
+    /**
+     * @ORM\Column(type="bigint")
+     * @Groups({"trans"})
+     */
+    private $comProprietaire;
+
+    /**
+     * @ORM\Column(type="bigint",nullable=true)
+     * @Groups({"trans"})
+     */
+    private $comRetrait;
+
+    /**
+     * @ORM\Column(type="bigint")
+     * @Groups({"trans"})
+     */
+    private $comEnvoie;
 
     public function __construct()
     {
@@ -345,6 +357,54 @@ class Transaction
     public function setUserRetrait(?User $userRetrait): self
     {
         $this->userRetrait = $userRetrait;
+
+        return $this;
+    }
+
+    public function getComEtat(): ?int
+    {
+        return $this->comEtat;
+    }
+
+    public function setComEtat(int $comEtat): self
+    {
+        $this->comEtat = $comEtat;
+
+        return $this;
+    }
+
+    public function getComProprietaire(): ?int
+    {
+        return $this->comProprietaire;
+    }
+
+    public function setComProprietaire(int $comProprietaire): self
+    {
+        $this->comProprietaire = $comProprietaire;
+
+        return $this;
+    }
+
+    public function getComRetrait(): ?bool
+    {
+        return $this->comRetrait;
+    }
+
+    public function setComRetrait(bool $comRetrait): self
+    {
+        $this->comRetrait = $comRetrait;
+
+        return $this;
+    }
+
+    public function getComEnvoie(): ?int
+    {
+        return $this->comEnvoie;
+    }
+
+    public function setComEnvoie(int $comEnvoie): self
+    {
+        $this->comEnvoie = $comEnvoie;
 
         return $this;
     }
