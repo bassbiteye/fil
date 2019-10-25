@@ -13,9 +13,7 @@ use App\Entity\Beneficiaire;
 use App\Form\ExpediteurType;
 use App\Form\BeneficiareType;
 use App\Form\TransactionType;
-use App\Entity\ComProprietaire;
 use App\Repository\UserRepository;
-use App\Repository\TarifsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\TransactionRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,10 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Constraints\DateTime;
-use Symfony\Component\DependencyInjection\Dumper\Dumper;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -201,7 +196,14 @@ class TransactionController extends AbstractController
                 'message' => 'le code n\'est pas valide'
             ];
             return new JsonResponse($data, 500);
-        }   
+        } 
+        if ($code->getValidate() == true) {
+            $exception = [
+                'status' => 500,
+                'message' => 'l\'argent a ete retiré'
+            ];
+            return new JsonResponse($exception, 500);
+        }  
      } catch (ParseException $exception) {
             $exception = [
                 'status' => 500,
@@ -232,7 +234,7 @@ class TransactionController extends AbstractController
             if (!$transaction) {
                 $exception = [
                     'statu' => 500,
-                    'messag' => 'le code n\'est pas valide'
+                    'message' => 'le code n\'est pas valide'
                 ];
                 return new JsonResponse($exception, 500);
             }
@@ -369,7 +371,7 @@ class TransactionController extends AbstractController
         } catch (ParseException $exception) {
             $exception = [
                 'status' => 500,
-                'message' => 'Vous devez renseigner les tous  champs'
+                'message' => 'Vous devez renseigner tous les  champs'
             ];
             return new JsonResponse($exception, 500);
         }

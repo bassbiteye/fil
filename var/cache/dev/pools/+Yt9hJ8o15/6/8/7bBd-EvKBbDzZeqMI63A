@@ -12,6 +12,7 @@ return $getExpiry ? PHP_INT_MAX : Hydrator::hydrate(
         clone $p['Symfony\\Component\\Serializer\\Annotation\\Groups'],
         clone $p['Symfony\\Component\\Serializer\\Annotation\\Groups'],
         clone $p['Symfony\\Component\\Serializer\\Annotation\\Groups'],
+        clone $p['Symfony\\Component\\Serializer\\Annotation\\Groups'],
     ],
     null,
     [
@@ -46,6 +47,9 @@ return $getExpiry ? PHP_INT_MAX : Hydrator::hydrate(
                 [
                     'listeP',
                 ],
+                [
+                    'trans',
+                ],
             ],
         ],
     ],
@@ -58,6 +62,7 @@ return $getExpiry ? PHP_INT_MAX : Hydrator::hydrate(
         $o[5],
         $o[6],
         $o[7],
+        $o[8],
     ],
     []
 );

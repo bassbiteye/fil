@@ -36,7 +36,7 @@ class Compte
      *@Groups({"affect"})
       *@Groups({"contrat","users"})
     *@Groups({"listeP"})
-
+     *  @Groups({"trans"})
      */
     private $numCompte;
 
@@ -46,6 +46,7 @@ class Compte
      * @Groups({"liste"})
      * @Groups({"lister"})
      *@Groups({"compte"})
+    *  @Groups({"trans"})
      * @Groups({"contrat","users"})
      */
     private $solde;

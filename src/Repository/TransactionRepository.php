@@ -61,7 +61,7 @@ class TransactionRepository extends ServiceEntityRepository
             ->andWhere('t.dateRetrait BETWEEN :from AND :to')
             ->setParameter('from', $from)
             ->setParameter('to', $to)
-            ->andWhere('t.user = :val')
+            ->andWhere('t.userRetrait = :val')
             ->setParameter('val', $user);
         $result = $qb->getQuery()->getResult();
 
