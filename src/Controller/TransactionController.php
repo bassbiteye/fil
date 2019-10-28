@@ -29,12 +29,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class TransactionController extends AbstractController
 {
+    public $status;
+    public $message;
     public $dateFrom;
     private $dateTo;
     public function __construct()
     {
         $this->dateFrom = 'dateFrom';
         $this->dateTo = 'dateTo';
+        $this->status = 'status';
+        $this->message = 'message';
     }
     /**
      *@Route("/envoi", name="envoi")
@@ -87,27 +91,28 @@ class TransactionController extends AbstractController
         $montant = $transaction->getMontantTransaction();
         if ($montant > $solde) {
             $data = [
-                'status' => 201,
-                'message' => 'Le montant est insuffisant '
+                $this->status => 201,
+                $this->message => 'Le montant est insuffisant '
             ];
             return new JsonResponse($data, 201);
         }
         for ($i = 0; $i < count($tarif); $i++) {
             if ($montant >= $tarif[$i]->getMin()&& $montant <= $tarif[$i]->getMax()) {
                 $transaction->setTarifs($tarif[$i]);
-                $comEnvoi = $tarif[$i]->getFrais();
-                $comE = $tarif[$i]->getFrais();
-                $comPr = $tarif[$i]->getFrais();
+                $frais= $tarif[$i]->getFrais();
+        
             }
         }
-        $comEnvoi = $comEnvoi * 20 / 100;
-        $comE =  $comE * 30 / 100;
-        $comPr = $comPr * 30 / 100;
+        
+        $comEnvoi = $frais * 20 / 100;
+        $comE =  $frais * 30 / 100;
+        $comPr = $frais * 30 / 100;
         $transaction->setMontantTransaction($montant);
         if($request->request->get('ok')){
-            $compte->setSolde($solde - ($montant +  $comEnvoi));
+            $compte->setSolde(($solde - $montant )+  $comEnvoi);
         }else{
-            $compte->setSolde($solde - $montant);
+            $montant=$montant-$frais;
+            $compte->setSolde($solde - $montant+$comEnvoi);
         }
 
         $errors = $validator->validate($transaction);
@@ -138,21 +143,21 @@ class TransactionController extends AbstractController
         if (!empty($response['access_token'])) {
             $senderAddress = 'tel:+221' . $expediteur->getTelephoneE();
             $receiverAddress = 'tel:+221' . $beneficiare->getTelephoneb();
-            $message = 'bienvenue sur fatfat tranfert '
+            $this->message = 'bienvenue sur fatfat tranfert '
                 . $expediteur->getNomE() . ' ' . $expediteur->getPrenomE() . ' vous as enoyé '
                 . $transaction->getMontantTransaction() . ',le code retrait est ' . $transaction->getCodeSecret() .
                 ' disponible dans toutes les agences fatfat';
             $senderName = $expediteur->getNomE();
 
-            $osms->sendSMS($senderAddress, $receiverAddress, $message, $senderName);
+            $osms->sendSMS($senderAddress, $receiverAddress, $this->message, $senderName);
         } else {
             // error
             echo $response['error'];
         }
 
         $data = [
-            'status' => 201,
-            'message' => 'Le transaction a ete fait avec succes ,le code est  ' . $random
+            $this->status => 201,
+            $this->message => 'Le transaction a ete fait avec succes ,le code est  ' . $random
         ];
         return new JsonResponse($data, 201);
     }
@@ -192,22 +197,22 @@ class TransactionController extends AbstractController
         $code = $repo->findOneBy(['codeSecret' =>  $transaction->getCodeSecret()]);
         if (!$code) {
             $data = [
-                'status' => 500,
-                'message' => 'le code n\'est pas valide'
+                $this->status => 500,
+                $this->message => 'le code n\'est pas valide'
             ];
             return new JsonResponse($data, 500);
         } 
         if ($code->getValidate() == true) {
             $exception = [
-                'status' => 500,
-                'message' => 'l\'argent a ete retiré'
+                $this->status => 500,
+                $this->message => 'l\'argent a ete retiré'
             ];
             return new JsonResponse($exception, 500);
         }  
      } catch (ParseException $exception) {
             $exception = [
-                'status' => 500,
-                'message' => 'Vous devez renseigner  tous  les champs'
+                $this->status => 500,
+                $this->message => 'Vous devez renseigner  tous  les champs'
             ];
             return new JsonResponse($exception, 500);
         }
@@ -233,16 +238,16 @@ class TransactionController extends AbstractController
             $transaction = $repo->findOneBy(['codeSecret' =>  $transaction->getCodeSecret()]);
             if (!$transaction) {
                 $exception = [
-                    'statu' => 500,
-                    'message' => 'le code n\'est pas valide'
+                    $this->status => 500,
+                    $this->message => 'le code n\'est pas valide'
                 ];
                 return new JsonResponse($exception, 500);
             }
 
             if ($transaction->getValidate() == true) {
                 $exception = [
-                    'status' => 500,
-                    'message' => 'l\'argent a ete retiré'
+                    $this->status => 500,
+                    $this->message => 'l\'argent a ete retiré'
                 ];
                 return new JsonResponse($exception, 500);
             }
@@ -261,8 +266,8 @@ class TransactionController extends AbstractController
             $compte->setSolde($solde + $transaction->getMontantTransaction() + $com);
             // if ($transaction->getMontantTransaction() > $solde) {
             //     $data = [
-            //         'status' => 201,
-            //         'message' => 'Le montant est insuffisant '
+            //         $this->status => 201,
+            //         $this->message => 'Le montant est insuffisant '
             //     ];
             //     return new JsonResponse($data, 201);
             // }
@@ -275,17 +280,17 @@ class TransactionController extends AbstractController
             }
         } catch (ParseException $exception) {
             $exception = [
-                'status' => 500,
-                'message' => 'Vous devez renseigner  tous  les champs'
+                $this->status => 500,
+                $this->message => 'Vous devez renseigner  tous  les champs'
             ];
             return new JsonResponse($exception, 500);
         }
         $entityentityManager->persist($transaction);
         $entityentityManager->flush();
         $data = [
-            'statuss' => 201,
+            $this->status => 201,
             'transations' => $transaction,
-            'messge' => 'Le retrait a ete fait avec succes '
+            $this->message => 'Le retrait a ete fait avec succes '
         ];
         return new JsonResponse($data, 201);
     }
@@ -297,11 +302,11 @@ class TransactionController extends AbstractController
 
         if ($debut > $fin) {
             return $this->json([
-                'message' => 'la date de début  ne doit etre superieure à la date de fin !'
+                $this->message => 'la date de début  ne doit etre superieure à la date de fin !'
             ]);
         } elseif ($fin > new \DateTime('now')) {
             return $this->json([
-                'message' => 'la date de début  ne doit etre superieure à la date d\'Aujourd\'hui !'
+                $this->message => 'la date de début  ne doit etre superieure à la date d\'Aujourd\'hui !'
             ]);
         }
 
@@ -365,13 +370,13 @@ class TransactionController extends AbstractController
             $detail = $repo1->getByDate($debut, $fin, $user);
             if ($detail == []) {
                 return $this->json([
-                    'message' => 'aucune transaction pour cette intervale!'
+                    $this->message => 'aucune transaction pour cette intervale!'
                 ]);
             }
         } catch (ParseException $exception) {
             $exception = [
-                'status' => 500,
-                'message' => 'Vous devez renseigner tous les  champs'
+                $this->status => 500,
+                $this->message => 'Vous devez renseigner tous les  champs'
             ];
             return new JsonResponse($exception, 500);
         }
@@ -400,13 +405,13 @@ class TransactionController extends AbstractController
             $detail = $repo1->finByDateR($debut, $fin, $user);
             if ($detail == []) {
                 return $this->json([
-                    'message' => 'aucune transaction pour cette intervale!'
+                    $this->message => 'aucune transaction pour cette intervale!'
                 ]);
             }
         } catch (ParseException $exception) {
             $exception = [
-                'status' => 500,
-                'message' => 'Vous devez renseigner les tous  champs'
+                $this->status => 500,
+                $this->message => 'Vous devez renseigner les tous  champs'
             ];
             return new JsonResponse($exception, 500);
         }
@@ -435,13 +440,13 @@ class TransactionController extends AbstractController
             $detail = $repo1->findEnP($debut, $fin, $user->getPartenaire());
             if ($detail == []) {
                 return $this->json([
-                    'message' => 'aucune transaction pour cette intervale!'
+                    $this->message => 'aucune transaction pour cette intervale!'
                 ]);
             }
         } catch (ParseException $exception) {
             $exception = [
-                'status' => 500,
-                'message' => 'Vous devez renseigner les tous  champs'
+                $this->status => 500,
+                $this->message => 'Vous devez renseigner les tous  champs'
             ];
             return new JsonResponse($exception, 500);
         }
@@ -470,13 +475,13 @@ class TransactionController extends AbstractController
             $detail = $repo1->findRetP($debut, $fin, $user->getPartenaire());
             if ($detail == []) {
                 return $this->json([
-                    'message' => 'aucune transaction pour cette intervale!'
+                    $this->message => 'aucune transaction pour cette intervale!'
                 ]);
             }
         } catch (ParseException $exception) {
             $exception = [
-                'status' => 500,
-                'message' => 'Vous devez renseigner les tous  champs'
+                $this->status => 500,
+                $this->message => 'Vous devez renseigner les tous  champs'
             ];
             return new JsonResponse($exception, 500);
         }
